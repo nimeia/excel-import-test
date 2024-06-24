@@ -5,6 +5,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsExcel;
+import org.example.vo.XlsIgnore;
 import org.example.vo.XlsSheet;
 import org.example.xls.config.XlsCellConfig;
 import org.example.xls.config.XlsExcelConfig;
@@ -95,6 +96,7 @@ public class XlsGlobalUtils {
                 allFields.addAll(ReflectionUtils.getAllFields(clazz, (f) -> true));
                 Collections.sort(allFields, (e1, e2) -> XlsAnnotationUtils.getFieldValueForJdk12(e1, "slot", Integer.class) - XlsAnnotationUtils.getFieldValueForJdk12(e2, "slot", Integer.class));
                 for (Field field : allFields) {
+                    if(field.isAnnotationPresent(XlsIgnore.class)) continue;
                     Class<?> type = field.getType();
                     XlsSheet xlsSheet = null;
                     if (Collection.class.isAssignableFrom(type)) {
@@ -471,7 +473,7 @@ public class XlsGlobalUtils {
         allFields.addAll(ReflectionUtils.getAllFields(aClass, f -> true));
         Collections.sort(allFields, (e1, e2) -> XlsAnnotationUtils.getFieldValueForJdk12(e1, "slot", Integer.class) - XlsAnnotationUtils.getFieldValueForJdk12(e2, "slot", Integer.class));
         allFields.forEach(field -> {
-            if (field.isAnnotationPresent(XlsCell.class)) {
+            if (field.isAnnotationPresent(XlsCell.class) && !field.isAnnotationPresent(XlsIgnore.class)) {
                 XlsCell xlsCell = field.getAnnotation(XlsCell.class);
                 XlsCellConfig xlsCellConfig = new XlsCellConfig(xlsCell);
                 XlsAnnotationUtils.setFieldValue(xlsCellConfig, "bindClass", aClass);
