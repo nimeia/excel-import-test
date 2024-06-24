@@ -27,6 +27,19 @@ public class XlsExcelConfig {
         this.bindClass = xlsExcel.bindClass();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        XlsExcelConfig that = (XlsExcelConfig) o;
+        return Objects.equals(bindClass, that.bindClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(bindClass);
+    }
+
     public Class<?> getBindClass() {
         return bindClass;
     }
@@ -39,16 +52,4 @@ public class XlsExcelConfig {
         return category;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        XlsExcelConfig that = (XlsExcelConfig) o;
-        return Objects.equals(bindClass, that.bindClass) && Objects.equals(title, that.title) && Objects.deepEquals(category, that.category);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(bindClass, title, Arrays.hashCode(category));
-    }
 }

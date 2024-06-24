@@ -30,12 +30,12 @@ public class XlsCellConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         XlsCellConfig that = (XlsCellConfig) o;
-        return index == that.index && Objects.equals(cellType, that.cellType) && Objects.equals(bindClass, that.bindClass) && Objects.equals(bindField, that.bindField) && Objects.equals(styleMethod, that.styleMethod) && Objects.equals(columnStyleMethod, that.columnStyleMethod) && Objects.deepEquals(headTitle, that.headTitle);
+        return Objects.equals(bindClass, that.bindClass) && Objects.equals(bindField, that.bindField);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cellType, bindClass, bindField, styleMethod, columnStyleMethod, Arrays.hashCode(headTitle), index);
+        return Objects.hash(bindClass, bindField);
     }
 
     public Class<?> getCellType() {

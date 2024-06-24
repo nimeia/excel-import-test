@@ -45,12 +45,12 @@ public class XlsSheetConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         XlsSheetConfig that = (XlsSheetConfig) o;
-        return isCollection == that.isCollection && sheetActive == that.sheetActive && headRow == that.headRow && index == that.index && hidden == that.hidden && Objects.equals(bindClass, that.bindClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(bindField, that.bindField) && Objects.equals(key, that.key) && Objects.equals(title, that.title);
+        return Objects.equals(bindClass, that.bindClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(bindField, that.bindField);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bindClass, ownerClass, bindField, isCollection, key, title, sheetActive, headRow, index, hidden);
+        return Objects.hash(bindClass, ownerClass, bindField);
     }
 
     public Class<?> getBindClass() {
