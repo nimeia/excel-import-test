@@ -23,7 +23,7 @@ public class XlsStyleConfig {
     String notEmptyValidationFormula = "A2<>\"\"";
 
 
-    public CellStyle headStyle(Sheet dataSheet ) {
+    public CellStyle headStyle(Sheet dataSheet) {
         CellStyle cellStyle = dataSheet.getWorkbook().createCellStyle();
         Font font = dataSheet.getWorkbook().createFont();
         // 设置字体加粗
@@ -35,7 +35,7 @@ public class XlsStyleConfig {
         return cellStyle;
     }
 
-    public CellStyle dateStyle(Sheet dataSheet ) {
+    public CellStyle dateStyle(Sheet dataSheet) {
         // 创建日期格式
         CreationHelper createHelper = dataSheet.getWorkbook().getCreationHelper();
         CellStyle cellStyle = dataSheet.getWorkbook().createCellStyle();

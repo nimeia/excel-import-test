@@ -10,7 +10,7 @@ public @interface XlsCell {
 
     Class<?> cellType() default void.class;
 
-    Class<?> bindClass() default void.class ;
+    Class<?> bindClass() default void.class;
 
     String bindField() default "";
 

@@ -5,14 +5,14 @@ import org.example.vo.XlsExcel;
 import java.util.List;
 import java.util.Map;
 
-@XlsExcel(title = "导入模板",category = {"type|key|name","type1|key1|name1","type2|key2|name2"}, bindClass = MainVo.class)
+@XlsExcel(title = "导入模板", category = {"type|key|name", "type1|key1|name1", "type2|key2|name2"}, bindClass = MainVo.class)
 public class MainVo extends BaseVo {
 
     Sheet1 sheet1;
 
     List<Sheet2> sheet2List;
 
-    Map<?,?> map ;
+    Map<?, ?> map;
 
     public Sheet1 getSheet1() {
         return sheet1;

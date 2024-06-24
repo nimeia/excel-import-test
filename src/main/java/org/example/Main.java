@@ -28,11 +28,11 @@ public class Main {
 //        Set<Field> allFields = ReflectionUtils.getAllFields(MainVo.class, (f)->true);
 //        System.out.println(allFields);
 
-//        XlsGlobalUtils.getXlsTemplate(MainVo.class);
+        XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
-        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test.xlsx"));
-        Object o = XlsGlobalUtils.loadData(byteArray);
-        System.out.println(o);
+//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test.xlsx"));
+//        Object o = XlsGlobalUtils.loadData(byteArray);
+//        System.out.println(o);
 
     }
 }

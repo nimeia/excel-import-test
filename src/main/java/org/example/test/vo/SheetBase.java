@@ -6,28 +6,28 @@ import org.example.vo.XlsSheet;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@XlsSheet(index=1 ,hidden=false , title = "Sheet 样例2",bindClass = SheetBase.class)
+@XlsSheet(index = 1, hidden = false, title = "Sheet 样例2")
 public class SheetBase {
 
-    @XlsCell(headTitle = {"组1","子组2","三级组2"},bindClass = SheetBase.class)
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
     private Integer id;
 
-    @XlsCell(headTitle = {"组1","子组2","三级组2"},bindClass = SheetBase.class)
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
     private String name;
 
-    @XlsCell(headTitle = {"组1","子组2","三级组2"},bindClass = SheetBase.class)
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
     private BigDecimal price;
 
-    @XlsCell(index = 3,bindClass = SheetBase.class)
+    @XlsCell(index = 3)
     private String email;
 
-    @XlsCell(index = 4,bindClass = SheetBase.class)
+    @XlsCell(index = 4)
     private Date birthDate;
 
-    @XlsCell(index = 5,bindClass = SheetBase.class)
+    @XlsCell(index = 5)
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"},bindClass = SheetBase.class)
+    @XlsCell(headTitle = {"隐藏列"})
     private String hiddenField;
 
     public Integer getId() {

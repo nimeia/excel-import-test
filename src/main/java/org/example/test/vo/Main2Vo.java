@@ -2,7 +2,7 @@ package org.example.test.vo;
 
 import org.example.vo.XlsExcel;
 
-@XlsExcel(title = "导入模板",category = {"type|key1|name","type1|key1|name1","type2|key2|name2"}, bindClass = MainVo.class)
+@XlsExcel(title = "导入模板", category = {"type|key1|name", "type1|key1|name1", "type2|key2|name2"}, bindClass = MainVo.class)
 public class Main2Vo {
 
 

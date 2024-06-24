@@ -13,7 +13,7 @@ public class StringToTypeConverterUtils {
     public static Object convert(String str, Class<?> clazz) throws Exception {
         if (clazz == String.class || clazz == CharSequence.class) {
             return str;
-        }else if (clazz == Integer.class || clazz == int.class) {
+        } else if (clazz == Integer.class || clazz == int.class) {
             return toInt(str);
         } else if (clazz == Double.class || clazz == double.class) {
             return toDouble(str);
@@ -173,6 +173,7 @@ public class StringToTypeConverterUtils {
         }
         return booleanArray;
     }
+
     public static Date parseDate(String dateString) throws ParseException {
         // 常见的日期时间格式
         String[] formats = {
@@ -243,7 +244,7 @@ public class StringToTypeConverterUtils {
             System.out.println("char: " + charValue);
             System.out.println("BigDecimal: " + bigDecimalValue);
             System.out.println("Date: " + dateValue);
-            System.out.println("Date: "+ convert(dateStr, Date.class));
+            System.out.println("Date: " + convert(dateStr, Date.class));
             System.out.println("List: " + listValue);
             System.out.println("int array: " + Arrays.toString(intArray));
             System.out.println("double array: " + Arrays.toString(doubleArray));

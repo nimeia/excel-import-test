@@ -7,28 +7,28 @@ import org.example.xls.config.XlsStyleConfig;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@XlsSheet(index = 1, hidden = false, title = "Sheet 样例3", bindClass = Sheet2.class)
+@XlsSheet(index = 1, hidden = false, title = "Sheet 样例3")
 public class Sheet2 extends XlsStyleConfig {
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组1"}, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组1"}, styleMethod = "headStyle")
     private Integer id;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private BigDecimal price;
 
-    @XlsCell(index = 3, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(index = 3, styleMethod = "headStyle")
     private String email;
 
-    @XlsCell(index = 4, bindClass = Sheet2.class, styleMethod = "headStyle", columnStyleMethod = "dateStyle")
+    @XlsCell(index = 4, styleMethod = "headStyle", columnStyleMethod = "dateStyle")
     private Date birthDate;
 
-    @XlsCell(index = 5, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(index = 5, styleMethod = "headStyle")
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"}, bindClass = Sheet2.class, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle")
     private String hiddenField;
 
 
