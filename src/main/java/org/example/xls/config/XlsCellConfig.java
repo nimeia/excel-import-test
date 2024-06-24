@@ -2,6 +2,8 @@ package org.example.xls.config;
 
 import org.example.vo.XlsCell;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class XlsCellConfig {
@@ -13,6 +15,18 @@ public class XlsCellConfig {
     private String columnStyleMethod;
     private String[] headTitle;
     private int index;
+    /**
+     * 属性field
+     */
+    private Field field;
+    /**
+     * set method
+     */
+    private Method setMethod;
+    /**
+     * get method
+     */
+    private Method getMethod;
 
     public XlsCellConfig(XlsCell xlsCell) {
         this.cellType = xlsCell.cellType();
@@ -35,6 +49,18 @@ public class XlsCellConfig {
     @Override
     public int hashCode() {
         return Objects.hash(bindClass, bindField);
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Method getSetMethod() {
+        return setMethod;
+    }
+
+    public Method getGetMethod() {
+        return getMethod;
     }
 
     public Class<?> getCellType() {

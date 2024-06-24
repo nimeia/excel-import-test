@@ -2,6 +2,10 @@ package org.example.xls.config;
 
 import org.example.vo.XlsSheet;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class XlsSheetConfig {
@@ -15,17 +19,33 @@ public class XlsSheetConfig {
     private boolean sheetActive;
     private int headRow;
     /**
+     * 属性field
+     */
+    private Field field;
+    /**
+     * set method
+     */
+    private Method setMethod;
+    /**
+     * get method
+     */
+    private Method getMethod;
+    /**
      * excel 中显示位置
      *
      * @return
      */
     private int index;
+
+
     /**
      * 是否隐藏
      *
      * @return
      */
     private boolean hidden;
+
+    private List<XlsCellConfig> xlsCellConfigs = new ArrayList<XlsCellConfig>();
 
     public XlsSheetConfig(XlsSheet xlsSheet) {
         this.bindClass = xlsSheet.getClass();
@@ -51,6 +71,10 @@ public class XlsSheetConfig {
     @Override
     public int hashCode() {
         return Objects.hash(bindClass, ownerClass, bindField);
+    }
+
+    public List<XlsCellConfig> getXlsCellConfigs() {
+        return xlsCellConfigs;
     }
 
     public Class<?> getBindClass() {
@@ -91,5 +115,17 @@ public class XlsSheetConfig {
 
     public boolean isHidden() {
         return hidden;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Method getSetMethod() {
+        return setMethod;
+    }
+
+    public Method getGetMethod() {
+        return getMethod;
     }
 }

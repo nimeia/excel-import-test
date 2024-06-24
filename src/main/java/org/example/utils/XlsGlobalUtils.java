@@ -29,15 +29,15 @@ public class XlsGlobalUtils {
 
     public static Map<Class<?>, XlsExcelConfig> allExcelConfigs = new HashMap<>();
 
-    public static Map<Class<?>, List<XlsSheetConfig>> allSheetConfigs = new HashMap<>();
+//    public static Map<Class<?>, List<XlsSheetConfig>> allSheetConfigs = new HashMap<>();
 
-    public static Map<Class<?>, List<XlsCellConfig>> allCellConfigs = new HashMap<>();
+//    public static Map<Class<?>, List<XlsCellConfig>> allCellConfigs = new HashMap<>();
 
     public static Map<Class<?>, byte[]> allTemplateCaches = new HashMap<>();
 
-    public static Map<XlsCellConfig, Field> allCellFields = new HashMap<>();
+    //public static Map<XlsCellConfig, Field> allCellFields = new HashMap<>();
 
-    public static Map<XlsSheetConfig, Field> allSheetFields = new HashMap<>();
+    //public static Map<XlsSheetConfig, Field> allSheetFields = new HashMap<>();
 
     /**
      * 初始化excel导入配置
@@ -74,7 +74,7 @@ public class XlsGlobalUtils {
             }
 
             //init sheet data
-            List<XlsSheetConfig> xlsSheets = allSheetConfigs.computeIfAbsent(clazz, k -> new ArrayList<>());
+            List<XlsSheetConfig> xlsSheets = xlsExcelConfig.getSheetConfigs();//allSheetConfigs.computeIfAbsent(clazz, k -> new ArrayList<>());
             if (clazz.isAnnotationPresent(XlsSheet.class)) {
                 XlsSheet xlsSheet = clazz.getAnnotation(XlsSheet.class);
                 XlsSheetConfig xlsSheetConfig = new XlsSheetConfig(xlsSheet);
@@ -85,8 +85,11 @@ public class XlsGlobalUtils {
                 //XlsAnnotationUtils.setAnnotationValue(xlsSheet, "ownerClass", clazz);
 
                 xlsSheets.add(xlsSheetConfig);
-                allSheetFields.put(xlsSheetConfig, null);
-                initSheets(clazz);
+                //allSheetFields.put(xlsSheetConfig, null);
+                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"field", null);
+                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"setMethod", null);
+                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"getMethod", null);
+                initSheets(clazz,xlsSheetConfig);
             } else {
                 List<Field> allFields = new ArrayList<>();
                 allFields.addAll(ReflectionUtils.getAllFields(clazz, (f) -> true));
@@ -123,9 +126,12 @@ public class XlsGlobalUtils {
                             XlsAnnotationUtils.setFieldValue(xlsSheetConfig, "ownerClass", clazz);
 
                             field.setAccessible(true);
-                            allSheetFields.put(xlsSheetConfig, field);
+                            //allSheetFields.put(xlsSheetConfig, field);
+                            XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"field", field);
+                            XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"setMethod", XlsAnnotationUtils.getSetterMethod(field.getType(),field.getName()));
+                            XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"getMethod", XlsAnnotationUtils.getSetterMethod(field.getType(),field.getName()));
                             xlsSheets.add(xlsSheetConfig);
-                            initSheets(actualTypeArgument);
+                            initSheets(actualTypeArgument,xlsSheetConfig);
                         } else {
                             if (!Map.class.isAssignableFrom(field.getType())) {
                                 XlsSheetConfig xlsSheetConfig = new XlsSheetConfig(xlsSheet);
@@ -137,9 +143,12 @@ public class XlsGlobalUtils {
                                 XlsAnnotationUtils.setAnnotationValue(xlsSheet, "bindField", field.getName());
                                 XlsAnnotationUtils.setAnnotationValue(xlsSheet, "ownerClass", clazz);*/
                                 field.setAccessible(true);
-                                allSheetFields.put(xlsSheetConfig, field);
+                                //allSheetFields.put(xlsSheetConfig, field);
+                                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"field", field);
+                                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"setMethod", XlsAnnotationUtils.getSetterMethod(field.getType(),field.getName()));
+                                XlsAnnotationUtils.setFieldValue(xlsSheetConfig,"getMethod", XlsAnnotationUtils.getSetterMethod(field.getType(),field.getName()));
                                 xlsSheets.add(xlsSheetConfig);
-                                initSheets(field.getType());
+                                initSheets(field.getType(),xlsSheetConfig);
                             } else {
                                 throw new RuntimeException("未支持集合类型：" + field.getType().getName());
                             }
@@ -167,7 +176,7 @@ public class XlsGlobalUtils {
             for (XlsSheetConfig xlsSheet : xlsSheets) {
                 int headRow = 1;
                 //xlsCells 排序
-                List<XlsCellConfig> xlsCells = allCellConfigs.get(xlsSheet.getBindClass());
+                List<XlsCellConfig> xlsCells = xlsSheet.getXlsCellConfigs();//allCellConfigs.get(xlsSheet.getBindClass());
                 for (int i = 0; i < xlsCells.size(); i++) {
                     int finalI = i;
                     boolean hadIndexed = xlsCells.stream().anyMatch(e -> e.getIndex() == finalI);
@@ -176,22 +185,22 @@ public class XlsGlobalUtils {
                                 .filter(e -> e.getIndex() == -1)
                                 .findFirst()
                                 .ifPresent(e -> {
-                                    Field field = allCellFields.get(e);
-                                    allCellFields.remove(e);
+//                                    Field field = allCellFields.get(e);
+//                                    allCellFields.remove(e);
                                     //XlsAnnotationUtils.setAnnotationValue(e, "index", finalI);
                                     XlsAnnotationUtils.setFieldValue(e, "index", finalI);
-                                    allCellFields.put(e, field);
+//                                    allCellFields.put(e, field);
                                 });
                     }
                     if (xlsCells.get(i).getHeadTitle().length > headRow) {
                         headRow = xlsCells.get(i).getHeadTitle().length;
                     }
                 }
-                Field field = allSheetFields.get(xlsSheet);
-                allSheetFields.remove(xlsSheet);
+//                Field field = allSheetFields.get(xlsSheet);
+//                allSheetFields.remove(xlsSheet);
                 //XlsAnnotationUtils.setAnnotationValue(xlsSheet,"headRow", headRow);
                 XlsAnnotationUtils.setFieldValue(xlsSheet, "headRow", headRow);
-                allSheetFields.put(xlsSheet, field);
+//                allSheetFields.put(xlsSheet, field);
                 Collections.sort(xlsCells, (e1, e2) -> e1.getIndex() - e2.getIndex());
             }
         }
@@ -211,7 +220,7 @@ public class XlsGlobalUtils {
             XlsExcelConfig xlsExcel = allExcelConfigs.get(clazz);
             if (xlsExcel == null) return null;
 
-            List<XlsSheetConfig> xlsSheetList = allSheetConfigs.get(clazz);
+            List<XlsSheetConfig> xlsSheetList = xlsExcel.getSheetConfigs();//allSheetConfigs.get(clazz);
             if (xlsSheetList == null) return null;
 
             for (XlsSheetConfig xlsSheet : xlsSheetList) {
@@ -225,7 +234,7 @@ public class XlsGlobalUtils {
                 }
 
                 //cell
-                List<XlsCellConfig> xlsCells = allCellConfigs.get(xlsSheet.getBindClass());
+                List<XlsCellConfig> xlsCells = xlsSheet.getXlsCellConfigs();//allCellConfigs.get(xlsSheet.getBindClass());
 
                 for (int j = 0; j < xlsSheet.getHeadRow(); j++) {
                     Row row = dataSheet.createRow(j);
@@ -347,7 +356,7 @@ public class XlsGlobalUtils {
                 Class<?> clazz = Class.forName(className);
                 XlsExcelConfig xlsExcel = allExcelConfigs.get(clazz);
                 if (xlsExcel == null) return null;
-                List<XlsSheetConfig> xlsSheetList = allSheetConfigs.get(clazz);
+                List<XlsSheetConfig> xlsSheetList = xlsExcel.getSheetConfigs();//allSheetConfigs.get(clazz);
                 if (xlsSheetList == null) return null;
 
                 Object result = xlsExcel.getBindClass().getDeclaredConstructor().newInstance();
@@ -359,21 +368,28 @@ public class XlsGlobalUtils {
 
                 for (XlsSheetConfig xlsSheet : xlsSheetList) {
                     Sheet dataSheet = workbook.getSheet(xlsSheet.getTitle());
-                    List<XlsCellConfig> xlsCells = allCellConfigs.get(xlsSheet.getBindClass());
+//                    List<XlsCellConfig> xlsCells = xlsSheet.getXlsCellConfigs();//allCellConfigs.get(xlsSheet.getBindClass());
                     int lastRowNum = dataSheet.getLastRowNum();
                     List datalist = new ArrayList<>();
 
                     //header 处理
                     Row row = dataSheet.getRow(xlsSheet.getHeadRow() - 1);
                     int headLastCellNum = row.getLastCellNum();
-                    List<Field> fieldList = new ArrayList<>();
-                    List<XlsCellConfig> xlsCellList = new ArrayList<>();
+//                    List<Field> fieldList = new ArrayList<>();
+                    List<XlsCellConfig> xlsCellList = xlsSheet.getXlsCellConfigs();//new ArrayList<>();
+                    //检查是否有乱序
                     for (int i = 0; i < headLastCellNum; i++) {
                         String fileName = row.getCell(i).getCellComment().getString().getString();
-                        XlsCellConfig xlsCell = xlsCells.stream().filter(e -> e.getBindField().equals(fileName)).findFirst().orElse(null);
-                        Field e = allCellFields.get(xlsCell);
-                        fieldList.add(e);
-                        xlsCellList.add(xlsCell);
+                        XlsCellConfig xlsCellConfig = xlsCellList.get(i);
+                        if(!xlsCellConfig.getBindField().equals(fileName)){
+                            throw new RuntimeException("模板配置字段顺序不一致，请检查！"+fileName);
+                        }
+
+                        //XlsCellConfig xlsCell = xlsCells.stream().filter(e -> e.getBindField().equals(fileName)).findFirst().orElse(null);
+                        // Field e = allCellFields.get(xlsCell);
+//                        Field e = xlsCell.getField();
+//                        fieldList.add(e);
+//                        xlsCellList.add(xlsCell);
                     }
 
                     for (int rowIndex = xlsSheet.getHeadRow(); rowIndex <= lastRowNum; rowIndex++) {
@@ -381,18 +397,32 @@ public class XlsGlobalUtils {
                         int lastCellNum = currentRowData.getLastCellNum();
                         Object data = xlsSheet.getBindClass().getDeclaredConstructor().newInstance();
                         for (int i = 0; i < lastCellNum; i++) {
-                            Field field = fieldList.get(i);
-                            System.out.println(String.format("get cell %s,%s for %s", rowIndex, i, field));
-                            //dataMap.put(headFiledNames.get(i), currentRowData.getCell(i).getStringCellValue());
+                            //Field field = fieldList.get(i);
+                            Field field = xlsCellList.get(i).getField();
+                            Method setMethod = xlsCellList.get(i).getSetMethod();
+                            // System.out.println(String.format("get cell %s,%s for %s", rowIndex, i, field));
+                            // dataMap.put(headFiledNames.get(i), currentRowData.getCell(i).getStringCellValue());
                             Object cellValue = ExcelUtil.getCellValue(currentRowData.getCell(i));
                             if (cellValue != null) {
                                 Class<?> aClass = xlsCellList.get(i).getCellType();
                                 if (cellValue.getClass() == aClass) {
-                                    field.set(data, cellValue);
+                                    if(setMethod!=null){
+                                        setMethod.invoke(data,cellValue);
+                                    }else{
+                                        field.set(data, cellValue);
+                                    }
                                 } else if (cellValue instanceof String) {
-                                    field.set(data, StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    if(setMethod!=null){
+                                        setMethod.invoke(data,StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    }else{
+                                        field.set(data, StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    }
                                 } else {
-                                    field.set(data, StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    if(setMethod!=null){
+                                        setMethod.invoke(data,  StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    }else{
+                                        field.set(data,  StringToTypeConverterUtils.convert(cellValue.toString(), aClass));
+                                    }
                                 }
                             }
                         }
@@ -401,12 +431,22 @@ public class XlsGlobalUtils {
                     if (sameFlag) {
                         return datalist;
                     }
-                    Field field = allSheetFields.get(xlsSheet);
+                    // Field field = allSheetFields.get(xlsSheet);
+                    Field field = xlsSheet.getField();
+                    Method setMethod = xlsSheet.getSetMethod();
                     if (Collection.class.isAssignableFrom(field.getType())) {
-                        field.set(result, datalist);
+                        if(setMethod!=null){
+                            setMethod.invoke(result,datalist);
+                        }else{
+                            field.set(result, datalist);
+                        }
                     } else {
                         if (datalist != null && datalist.size() > 0) {
-                            field.set(result, datalist.get(0));
+                            if(setMethod!=null){
+                                setMethod.invoke(result,datalist.get(0));
+                            }else{
+                                field.set(result, datalist.get(0));
+                            }
                         }
                     }
                 }
@@ -426,7 +466,7 @@ public class XlsGlobalUtils {
      *
      * @param aClass
      */
-    private static void initSheets(Class<?> aClass) {
+    private static void initSheets(Class<?> aClass,XlsSheetConfig xlsSheetConfig) {
         List<Field> allFields = new ArrayList<>();
         allFields.addAll(ReflectionUtils.getAllFields(aClass, f -> true));
         Collections.sort(allFields, (e1, e2) -> XlsAnnotationUtils.getFieldValueForJdk12(e1, "slot", Integer.class) - XlsAnnotationUtils.getFieldValueForJdk12(e2, "slot", Integer.class));
@@ -437,7 +477,7 @@ public class XlsGlobalUtils {
                 XlsAnnotationUtils.setFieldValue(xlsCellConfig, "bindClass", aClass);
                 XlsAnnotationUtils.setFieldValue(xlsCellConfig, "bindField", field.getName());
                 // XlsAnnotationUtils.setAnnotationValue(xlsCell,"bindClass", aClass);
-                //XlsAnnotationUtils.setAnnotationValue(xlsCell,"bindField", field.getName());
+                // XlsAnnotationUtils.setAnnotationValue(xlsCell,"bindField", field.getName());
                 if (xlsCell.headTitle().length == 0) {
                     //XlsAnnotationUtils.setAnnotationValue(xlsCell,"headTitle", new String[]{field.getName()});
                     XlsAnnotationUtils.setFieldValue(xlsCellConfig, "headTitle", new String[]{field.getName()});
@@ -446,12 +486,15 @@ public class XlsGlobalUtils {
                     //XlsAnnotationUtils.setAnnotationValue(xlsCell,"cellType", field.getType());
                     XlsAnnotationUtils.setFieldValue(xlsCellConfig, "cellType", field.getType());
                 }
-                List<XlsCellConfig> xlsCells = allCellConfigs.computeIfAbsent(aClass, k -> new ArrayList<>());
+                List<XlsCellConfig> xlsCells = xlsSheetConfig.getXlsCellConfigs();//allCellConfigs.computeIfAbsent(aClass, k -> new ArrayList<>());
                 boolean hadAdd = xlsCells.stream().anyMatch(e -> e.equals(xlsCellConfig));
                 if (!hadAdd) {
                     xlsCells.add(xlsCellConfig);
                     field.setAccessible(true);
-                    allCellFields.put(xlsCellConfig, field);
+                    //allCellFields.put(xlsCellConfig, field);
+                    XlsAnnotationUtils.setFieldValue(xlsCellConfig, "field", field);
+                    XlsAnnotationUtils.setFieldValue(xlsCellConfig, "setMethod", XlsAnnotationUtils.getSetterMethod(field.getType(),field.getName()));
+                    XlsAnnotationUtils.setFieldValue(xlsCellConfig, "getMethod", XlsAnnotationUtils.getGetterMethod(field.getType(),field.getName()));
                 }
             }
         });
@@ -460,17 +503,12 @@ public class XlsGlobalUtils {
 
     private static void mergeSameCells(Sheet sheet) {
         int lastRowNum = sheet.getLastRowNum();
-        boolean canMerge = false;
         for (int rowIndex = 0; rowIndex <= lastRowNum; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
             if (row == null) continue;
 
             int lastCellNum = row.getLastCellNum();
             for (int cellIndex = 0; cellIndex <= lastCellNum; cellIndex++) {
-                if (cellIndex == 0 && rowIndex == 0) {
-                    canMerge = true;
-                }
-
                 Cell cell = row.getCell(cellIndex);
                 if (cell == null) continue;
                 if (isMergedCell(sheet, cell)) continue;
@@ -481,8 +519,7 @@ public class XlsGlobalUtils {
                 int startCell = cellIndex;
                 int endCell = cellIndex;
 
-//                System.out.println(String.format("=====%d:%d - %d:%d", startRow,startCell,endRow,endCell));
-
+                //System.out.println(String.format("=====%d:%d - %d:%d", startRow,startCell,endRow,endCell));
                 for (int c = cellIndex + 1; c <= lastCellNum; c++) {
                     Row nextRow = sheet.getRow(rowIndex);
                     if (nextRow == null) break;
@@ -511,7 +548,7 @@ public class XlsGlobalUtils {
                         }
                     }
                 }
-//                System.out.println(String.format("%d:%d - %d:%d", startRow,startCell,endRow,endCell));
+                // System.out.println(String.format("%d:%d - %d:%d", startRow,startCell,endRow,endCell));
                 // 如果找到相同的单元格则进行合并
                 if (endRow > startRow || endCell > startCell) {
                     sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, startCell, endCell));

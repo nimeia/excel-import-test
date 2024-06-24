@@ -2,6 +2,8 @@ package org.example.xls.config;
 
 import org.example.vo.XlsExcel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class XlsExcelConfig {
@@ -19,6 +21,7 @@ public class XlsExcelConfig {
      */
     private String[] category;
 
+    private List<XlsSheetConfig> sheetConfigs = new ArrayList<>();
 
     public XlsExcelConfig(XlsExcel xlsExcel) {
         this.title = xlsExcel.title();
@@ -37,6 +40,10 @@ public class XlsExcelConfig {
     @Override
     public int hashCode() {
         return Objects.hashCode(bindClass);
+    }
+
+    public List<XlsSheetConfig> getSheetConfigs() {
+        return sheetConfigs;
     }
 
     public Class<?> getBindClass() {

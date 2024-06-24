@@ -1,8 +1,10 @@
 package org.example;
 
+import org.apache.poi.util.IOUtils;
 import org.example.test.vo.MainVo;
 import org.example.utils.XlsGlobalUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -28,9 +30,9 @@ public class Main {
 
         XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
-//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test.xlsx"));
-//        Object o = XlsGlobalUtils.loadData(byteArray);
-//        System.out.println(o);
+        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
+        Object o = XlsGlobalUtils.loadData(byteArray);
+        System.out.println(o);
 
     }
 }

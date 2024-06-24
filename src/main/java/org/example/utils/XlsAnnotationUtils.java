@@ -71,6 +71,28 @@ public class XlsAnnotationUtils {
         }
     }
 
+    /**
+     *
+     * @param clazz
+     * @param propertyName
+     * @return
+     */
+    public static Method getSetterMethod(Class<?> clazz, String propertyName) {
+        String methodName = "set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(e -> e.getName().equals(methodName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Method getGetterMethod(Class<?> clazz, String propertyName) {
+        String methodName = "get" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(e -> e.getName().equals(methodName))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static <T> T getFieldValue(Object o, String fieldName, Class<T> tClass) {
         try {
             Field secretField = Arrays.stream(o.getClass().getDeclaredFields())
