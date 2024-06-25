@@ -22,4 +22,8 @@ public @interface XlsCell {
 
     int index() default -1;
 
+    Class<?> toClass() default void.class;
+
+    String toField() default "";
+
 }

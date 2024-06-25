@@ -1,5 +1,7 @@
 package org.example.test.vo;
 
+import org.example.business.BusinessSheet1;
+import org.example.business.BusinessSheet2;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
 import org.example.xls.config.XlsStyleConfig;
@@ -7,7 +9,7 @@ import org.example.xls.config.XlsStyleConfig;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@XlsSheet(index = 1, hidden = false, title = "Sheet 样例3")
+@XlsSheet(index = 1, hidden = false, title = "Sheet 样例3",toClass = BusinessSheet2.class)
 public class Sheet2 extends XlsStyleConfig {
 
     @XlsCell(headTitle = {"组1", "子组2", "三级组1"}, styleMethod = "headStyle")
@@ -18,6 +20,9 @@ public class Sheet2 extends XlsStyleConfig {
 
     @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private BigDecimal price;
+
+    @XlsCell(headTitle = {"主表ID"}, styleMethod = "headStyle")
+    private Integer parentId;
 
     @XlsCell(index = 3, styleMethod = "headStyle")
     private String email;

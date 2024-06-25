@@ -15,6 +15,10 @@ public class XlsCellConfig {
     private String columnStyleMethod;
     private String[] headTitle;
     private int index;
+
+    private Class<?> toClass;
+
+    private String toField;
     /**
      * 属性field
      */
@@ -28,6 +32,19 @@ public class XlsCellConfig {
      */
     private Method getMethod;
 
+    /**
+     * 属性field
+     */
+    private Field targetField;
+    /**
+     * set method
+     */
+    private Method targetSetMethod;
+    /**
+     * get method
+     */
+    private Method targetGetMethod;
+
     public XlsCellConfig(XlsCell xlsCell) {
         this.cellType = xlsCell.cellType();
         this.bindClass = xlsCell.bindClass();
@@ -36,6 +53,8 @@ public class XlsCellConfig {
         this.columnStyleMethod = xlsCell.columnStyleMethod();
         this.headTitle = xlsCell.headTitle();
         this.index = xlsCell.index();
+        this.toClass = xlsCell.toClass();
+        this.toField = xlsCell.toField();
     }
 
     @Override
@@ -89,5 +108,25 @@ public class XlsCellConfig {
 
     public int getIndex() {
         return index;
+    }
+
+    public Field getTargetField() {
+        return targetField;
+    }
+
+    public Method getTargetSetMethod() {
+        return targetSetMethod;
+    }
+
+    public Method getTargetGetMethod() {
+        return targetGetMethod;
+    }
+
+    public Class<?> getToClass() {
+        return toClass;
+    }
+
+    public String getToField() {
+        return toField;
     }
 }

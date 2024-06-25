@@ -6,7 +6,7 @@ import org.example.vo.XlsIgnore;
 import java.util.List;
 import java.util.Map;
 
-@XlsExcel(title = "导入模板", category = {"type|key|name", "type1|key1|name1", "type2|key2|name2"}, bindClass = MainVo.class)
+@XlsExcel(title = "导入模板", category = {"type|key|name", "type1|key1|name1", "type2|key2|name2"})
 public class MainVo extends BaseVo {
 
     @XlsIgnore

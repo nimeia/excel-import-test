@@ -18,6 +18,14 @@ public class XlsSheetConfig {
     private String title;
     private boolean sheetActive;
     private int headRow;
+
+    /**
+     * 填充目标对象
+     * @return
+     */
+    private Class<?> toClass ;
+
+    private boolean fillByFiledName;
     /**
      * 属性field
      */
@@ -58,6 +66,8 @@ public class XlsSheetConfig {
         this.headRow = xlsSheet.headRow();
         this.index = xlsSheet.index();
         this.hidden = xlsSheet.hidden();
+        this.toClass = xlsSheet.toClass();
+        this.fillByFiledName = xlsSheet.fillByFiledName();
     }
 
     @Override
@@ -75,6 +85,14 @@ public class XlsSheetConfig {
 
     public List<XlsCellConfig> getXlsCellConfigs() {
         return xlsCellConfigs;
+    }
+
+    public Class<?> getToClass() {
+        return toClass;
+    }
+
+    public boolean isFillByFiledName() {
+        return fillByFiledName;
     }
 
     public Class<?> getBindClass() {
