@@ -21,9 +21,10 @@ public class XlsSheetConfig {
 
     /**
      * 填充目标对象
+     *
      * @return
      */
-    private Class<?> toClass ;
+    private Class<?> toClass;
 
     private boolean fillByFiledName;
     /**

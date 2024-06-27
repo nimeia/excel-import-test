@@ -1,7 +1,5 @@
 package org.example.vo;
 
-import org.example.business.BusinessSheet1;
-
 import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
@@ -41,6 +39,7 @@ public @interface XlsSheet {
 
     /**
      * 填充目标对象
+     *
      * @return
      */
     Class<?> toClass() default void.class;

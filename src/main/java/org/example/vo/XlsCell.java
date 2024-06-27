@@ -31,12 +31,14 @@ public @interface XlsCell {
 
     /**
      * 属于哪个类
+     *
      * @return
      */
     Class<?> toClass() default void.class;
 
     /**
      * 属于哪个类的哪个属性
+     *
      * @return
      */
     String toField() default "";

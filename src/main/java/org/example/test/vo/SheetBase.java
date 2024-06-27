@@ -7,7 +7,7 @@ import org.example.vo.XlsSheet;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@XlsSheet(index = 1, hidden = false, title = "Sheet 样例2",toClass = BusinessSheet1.class)
+@XlsSheet(index = 1, hidden = false, title = "Sheet 样例2", toClass = BusinessSheet1.class)
 public class SheetBase {
 
     @XlsCell(headTitle = {"组1", "子组2", "三级组2"})

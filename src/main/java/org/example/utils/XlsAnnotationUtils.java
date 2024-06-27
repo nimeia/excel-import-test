@@ -65,14 +65,13 @@ public class XlsAnnotationUtils {
     public static void setFieldValue(Object object, String fieldName, Object newValue) {
         if (object == null) return;
         try {
-            getField(object.getClass(),fieldName).set(object,newValue);
+            getField(object.getClass(), fieldName).set(object, newValue);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     *
      * @param clazz
      * @param propertyName
      * @return
@@ -110,17 +109,17 @@ public class XlsAnnotationUtils {
 
 
     public static <T> T getFieldValueForJdk12(Object o, String fieldName, Class<T> tClass) {
-        if(o == null) return null;
+        if (o == null) return null;
         try {
-            return (T) getField(o.getClass(),fieldName).get(o);
+            return (T) getField(o.getClass(), fieldName).get(o);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Field getField(Class clazz , String fieldName) {
+    private static Field getField(Class clazz, String fieldName) {
         String key = clazz.getName() + "." + fieldName;
-        return fieldCache.computeIfAbsent(key,k -> {
+        return fieldCache.computeIfAbsent(key, k -> {
             try {
                 Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
                 getDeclaredFields0.setAccessible(true);
