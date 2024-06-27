@@ -205,55 +205,55 @@ public class StringToTypeConverterUtils {
         // 如果所有格式都尝试过了，仍然无法解析，则抛出 ParseException
         throw new ParseException("Unparseable date: " + dateString, 0);
     }
-
-    public static void main(String[] args) {
-        try {
-            // 基本类型转换
-            int intValue = StringToTypeConverterUtils.toInt("123");
-            double doubleValue = StringToTypeConverterUtils.toDouble("123.45");
-            boolean booleanValue = StringToTypeConverterUtils.toBoolean("true");
-            long longValue = StringToTypeConverterUtils.toLong("123456789");
-            float floatValue = StringToTypeConverterUtils.toFloat("123.45");
-            short shortValue = StringToTypeConverterUtils.toShort("123");
-            byte byteValue = StringToTypeConverterUtils.toByte("123");
-            char charValue = StringToTypeConverterUtils.toChar("a");
-            BigDecimal bigDecimalValue = StringToTypeConverterUtils.toBigDecimal("123.45");
-
-            // 日期转换
-            String dateStr = "2024-06-18";
-            Date dateValue = StringToTypeConverterUtils.toDate(dateStr, "yyyy-MM-dd");
-
-            // 列表和数组转换
-            List<String> listValue = StringToTypeConverterUtils.toList("a, b, c");
-            int[] intArray = StringToTypeConverterUtils.toIntArray("1, 2, 3");
-            double[] doubleArray = StringToTypeConverterUtils.toDoubleArray("1.1, 2.2, 3.3");
-            boolean[] booleanArray = StringToTypeConverterUtils.toBooleanArray("true, false, true");
-
-            // 示例枚举类型
-            enum Color {RED, GREEN, BLUE}
-            Color color = StringToTypeConverterUtils.toEnum("RED", Color.class);
-
-            // 打印转换结果
-            System.out.println("int: " + intValue);
-            System.out.println("double: " + doubleValue);
-            System.out.println("boolean: " + booleanValue);
-            System.out.println("long: " + longValue);
-            System.out.println("float: " + floatValue);
-            System.out.println("short: " + shortValue);
-            System.out.println("byte: " + byteValue);
-            System.out.println("char: " + charValue);
-            System.out.println("BigDecimal: " + bigDecimalValue);
-            System.out.println("Date: " + dateValue);
-            System.out.println("Date: " + convert(dateStr, Date.class));
-            System.out.println("List: " + listValue);
-            System.out.println("int array: " + Arrays.toString(intArray));
-            System.out.println("double array: " + Arrays.toString(doubleArray));
-            System.out.println("boolean array: " + Arrays.toString(booleanArray));
-            System.out.println("enum: " + color);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    public static void main(String[] args) {
+//        try {
+//            // 基本类型转换
+//            int intValue = StringToTypeConverterUtils.toInt("123");
+//            double doubleValue = StringToTypeConverterUtils.toDouble("123.45");
+//            boolean booleanValue = StringToTypeConverterUtils.toBoolean("true");
+//            long longValue = StringToTypeConverterUtils.toLong("123456789");
+//            float floatValue = StringToTypeConverterUtils.toFloat("123.45");
+//            short shortValue = StringToTypeConverterUtils.toShort("123");
+//            byte byteValue = StringToTypeConverterUtils.toByte("123");
+//            char charValue = StringToTypeConverterUtils.toChar("a");
+//            BigDecimal bigDecimalValue = StringToTypeConverterUtils.toBigDecimal("123.45");
+//
+//            // 日期转换
+//            String dateStr = "2024-06-18";
+//            Date dateValue = StringToTypeConverterUtils.toDate(dateStr, "yyyy-MM-dd");
+//
+//            // 列表和数组转换
+//            List<String> listValue = StringToTypeConverterUtils.toList("a, b, c");
+//            int[] intArray = StringToTypeConverterUtils.toIntArray("1, 2, 3");
+//            double[] doubleArray = StringToTypeConverterUtils.toDoubleArray("1.1, 2.2, 3.3");
+//            boolean[] booleanArray = StringToTypeConverterUtils.toBooleanArray("true, false, true");
+//
+//            // 示例枚举类型
+//            enum Color {RED, GREEN, BLUE}
+//            Color color = StringToTypeConverterUtils.toEnum("RED", Color.class);
+//
+//            // 打印转换结果
+//            System.out.println("int: " + intValue);
+//            System.out.println("double: " + doubleValue);
+//            System.out.println("boolean: " + booleanValue);
+//            System.out.println("long: " + longValue);
+//            System.out.println("float: " + floatValue);
+//            System.out.println("short: " + shortValue);
+//            System.out.println("byte: " + byteValue);
+//            System.out.println("char: " + charValue);
+//            System.out.println("BigDecimal: " + bigDecimalValue);
+//            System.out.println("Date: " + dateValue);
+//            System.out.println("Date: " + convert(dateStr, Date.class));
+//            System.out.println("List: " + listValue);
+//            System.out.println("int array: " + Arrays.toString(intArray));
+//            System.out.println("double array: " + Arrays.toString(doubleArray));
+//            System.out.println("boolean array: " + Arrays.toString(booleanArray));
+//            System.out.println("enum: " + color);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

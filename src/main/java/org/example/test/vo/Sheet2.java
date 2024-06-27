@@ -36,6 +36,16 @@ public class Sheet2 extends XlsStyleConfig {
     @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle")
     private String hiddenField;
 
+    @XlsCell(index = 6, styleMethod = "headStyle", innerSheetRowCount = 3)
+    private InnerSheet innerSheet;
+
+    public InnerSheet getInnerSheet() {
+        return innerSheet;
+    }
+
+    public void setInnerSheet(InnerSheet innerSheet) {
+        this.innerSheet = innerSheet;
+    }
 
     public Integer getId() {
         return id;

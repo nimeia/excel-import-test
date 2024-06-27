@@ -1,7 +1,10 @@
 package org.example.test.vo;
 
+import org.example.vo.XlsIgnore;
+
 public class BaseVo {
 
+    @XlsIgnore
     SheetBase sheetBase;
 
     public SheetBase getSheetBase() {

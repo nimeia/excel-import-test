@@ -45,6 +45,16 @@ public class XlsCellConfig {
      */
     private Method targetGetMethod;
 
+    /**
+     * 嵌套类对象
+     */
+    private Class<?> innerSheetToClass;
+
+    /**
+     * 嵌套类最大条数
+     */
+    private int innerSheetRowCount;
+
     public XlsCellConfig(XlsCell xlsCell) {
         this.cellType = xlsCell.cellType();
         this.bindClass = xlsCell.bindClass();
@@ -55,6 +65,8 @@ public class XlsCellConfig {
         this.index = xlsCell.index();
         this.toClass = xlsCell.toClass();
         this.toField = xlsCell.toField();
+        this.innerSheetToClass = xlsCell.innerSheetToClass();
+        this.innerSheetRowCount = xlsCell.innerSheetRowCount();
     }
 
     @Override
@@ -128,5 +140,13 @@ public class XlsCellConfig {
 
     public String getToField() {
         return toField;
+    }
+
+    public Class<?> getInnerSheetToClass() {
+        return innerSheetToClass;
+    }
+
+    public int getInnerSheetRowCount() {
+        return innerSheetRowCount;
     }
 }

@@ -22,8 +22,21 @@ public @interface XlsCell {
 
     int index() default -1;
 
+    Class<?> innerSheetToClass() default void.class;
+
+    int innerSheetRowCount() default 1;
+
+
+    /**
+     * 属于哪个类
+     * @return
+     */
     Class<?> toClass() default void.class;
 
+    /**
+     * 属于哪个类的哪个属性
+     * @return
+     */
     String toField() default "";
 
 }
