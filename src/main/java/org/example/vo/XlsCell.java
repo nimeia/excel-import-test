@@ -24,6 +24,8 @@ public @interface XlsCell {
 
     Class<?> innerSheetToClass() default void.class;
 
+    String innerSheetToField() default "";
+
     int innerSheetRowCount() default 1;
 
 

@@ -50,10 +50,44 @@ public class XlsCellConfig {
      */
     private Class<?> innerSheetToClass;
 
+    private String innerSheetToField;
+
     /**
      * 嵌套类最大条数
      */
     private int innerSheetRowCount;
+
+    /**
+     * 属性field
+     */
+    private Field innerSheetField;
+    /**
+     * set method
+     */
+    private Method innerSheetSetMethod;
+    /**
+     * get method
+     */
+    private Method innerSheetGetMethod;
+
+    /**
+     * 属性field
+     */
+    private Field innerSheetTargetField;
+    /**
+     * set method
+     */
+    private Method innerSheetTargetSetMethod;
+    /**
+     * get method
+     */
+    private Method innerSheetTargetGetMethod;
+
+    /**
+     * 嵌套类序号
+     */
+    private int innerSheetIndex;
+
 
     public XlsCellConfig(XlsCell xlsCell) {
         this.cellType = xlsCell.cellType();
@@ -67,6 +101,7 @@ public class XlsCellConfig {
         this.toField = xlsCell.toField();
         this.innerSheetToClass = xlsCell.innerSheetToClass();
         this.innerSheetRowCount = xlsCell.innerSheetRowCount();
+        this.innerSheetToField = xlsCell.innerSheetToField();
     }
 
     @Override
@@ -80,6 +115,10 @@ public class XlsCellConfig {
     @Override
     public int hashCode() {
         return Objects.hash(bindClass, bindField);
+    }
+
+    public int getInnerSheetIndex() {
+        return innerSheetIndex;
     }
 
     public Field getField() {
@@ -148,5 +187,29 @@ public class XlsCellConfig {
 
     public int getInnerSheetRowCount() {
         return innerSheetRowCount;
+    }
+
+    public Field getInnerSheetField() {
+        return innerSheetField;
+    }
+
+    public Method getInnerSheetSetMethod() {
+        return innerSheetSetMethod;
+    }
+
+    public Method getInnerSheetGetMethod() {
+        return innerSheetGetMethod;
+    }
+
+    public Field getInnerSheetTargetField() {
+        return innerSheetTargetField;
+    }
+
+    public Method getInnerSheetTargetSetMethod() {
+        return innerSheetTargetSetMethod;
+    }
+
+    public Method getInnerSheetTargetGetMethod() {
+        return innerSheetTargetGetMethod;
     }
 }
