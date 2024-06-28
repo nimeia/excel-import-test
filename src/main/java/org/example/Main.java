@@ -35,9 +35,9 @@ public class Main {
         Object o = XlsGlobalUtils.loadData(byteArray);
         System.out.println(o);
 
-//        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
 
-//        System.out.println(businessObj);
+        System.out.println(businessObj);
 
 
     }

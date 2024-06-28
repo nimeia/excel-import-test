@@ -6,10 +6,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class XlsAnnotationUtils {
@@ -105,6 +102,131 @@ public class XlsAnnotationUtils {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 初始化 filed
+     * @param targetObj
+     * @param field
+     * @return
+     */
+    public static Object initField(Object targetObj, Field field, Method setMethod, Method getMethod) {
+        try {
+            Object targetFiledObj = null;
+            boolean newFlag = false;
+            if (getMethod != null) {
+                targetFiledObj = getMethod.invoke(targetObj);
+            } else {
+                field.setAccessible(true);
+                targetFiledObj = field.get(targetObj);
+            }
+            if (targetFiledObj == null) {
+                targetFiledObj = field.getType().getDeclaredConstructor().newInstance();
+                newFlag = true;
+                if (setMethod == null) {
+                    setMethod.invoke(targetObj, targetFiledObj);
+                } else {
+                    field.set(targetObj, targetFiledObj);
+                }
+            }
+
+            if (newFlag && Collection.class.isAssignableFrom(field.getType())) {
+                // 当前集合的泛型类型
+                Type genericType = field.getGenericType();
+                ParameterizedType pt = (ParameterizedType) genericType;
+                // 得到泛型里的class类型对象
+                Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
+                Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                ((Collection)targetFiledObj).add(collectionObj);
+            }
+
+            return targetFiledObj;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 设置 filed value
+     * @param targetObj
+     * @param fieldValue
+     * @param field
+     * @param setMethod
+     * @param innerSheetField
+     * @param innerSetMethod
+     * @param index
+     */
+    public static void setFileValue(Object targetObj,
+                                    Object fieldValue,
+                                    Field field,
+                                    Method setMethod,
+                                    Field innerSheetField,
+                                    Method innerSetMethod,
+                                    Integer index) {
+        try {
+            if (innerSetMethod != null || innerSheetField != null) {
+                Object realObj = targetObj;
+                if (index != null) {
+                    while (((Collection<?>) targetObj).size() <= index) {
+                        Type genericType = field.getGenericType();
+                        ParameterizedType pt = (ParameterizedType) genericType;
+                        // 得到泛型里的class类型对象
+                        Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
+                        Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                        ((Collection) targetObj).add(collectionObj);
+                    }
+
+                    if (targetObj instanceof Set<?>) {
+                        realObj = ((Set) targetObj).toArray()[index];
+                    } else if (targetObj instanceof List<?>) {
+                        realObj = ((List) targetObj).get(index);
+                    }
+                    if (innerSetMethod != null) {
+                        innerSetMethod.invoke(realObj, fieldValue);
+                    } else {
+                        innerSheetField.set(realObj, fieldValue);
+                    }
+                } else {
+                    if (innerSetMethod != null) {
+                        innerSetMethod.invoke(realObj, fieldValue);
+                    } else {
+                        innerSheetField.set(realObj, fieldValue);
+                    }
+                }
+            } else {
+                Object realObj = targetObj;
+                if (index != null) {
+                    while (((Collection) targetObj).size() <= index) {
+                        Type genericType = field.getGenericType();
+                        ParameterizedType pt = (ParameterizedType) genericType;
+                        // 得到泛型里的class类型对象
+                        Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
+                        Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                        ((Collection) targetObj).add(collectionObj);
+                    }
+
+                    if (targetObj instanceof Set<?>) {
+                        realObj = ((Set) targetObj).toArray()[index];
+                    } else if (targetObj instanceof List<?>) {
+                        realObj = ((List) targetObj).get(index);
+                    }
+                    if (setMethod != null) {
+                        setMethod.invoke(realObj, fieldValue);
+                    } else {
+                        field.set(realObj, fieldValue);
+                    }
+                } else {
+                    if (setMethod != null) {
+                        setMethod.invoke(realObj, fieldValue);
+                    } else {
+                        field.set(realObj, fieldValue);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

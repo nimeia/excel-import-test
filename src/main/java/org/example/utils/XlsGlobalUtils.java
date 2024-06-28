@@ -11,7 +11,6 @@ import org.example.xls.config.XlsCellConfig;
 import org.example.xls.config.XlsExcelConfig;
 import org.example.xls.config.XlsSheetConfig;
 import org.reflections.ReflectionUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -568,32 +567,39 @@ public class XlsGlobalUtils {
                 Object targetObj = targetClass.getDeclaredConstructor().newInstance();
                 Object finalLoopObj = loopObj;
                 sheetConfig.getXlsCellConfigs().forEach(cellConfig -> {
-                    if (cellConfig.getTargetSetMethod() != null) {
-                        try {
-                            Object resultO = null;
-                            if (cellConfig.getGetMethod() != null) {
-                                resultO = cellConfig.getGetMethod().invoke(finalLoopObj);
-                            } else {
-                                resultO = cellConfig.getField().get(finalLoopObj);
-                            }
+                    if (cellConfig.getInnerSheetField() != null) {
+                        Object innerSheetObj = XlsAnnotationUtils.initField(targetObj, cellConfig.getField(), cellConfig.getSetMethod(), cellConfig.getGetMethod());
 
-                            cellConfig.getTargetSetMethod().invoke(targetObj, resultO);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (cellConfig.getTargetField() != null) {
-                        try {
-                            Object resultO = null;
-                            if (cellConfig.getGetMethod() != null) {
-                                resultO = cellConfig.getGetMethod().invoke(finalLoopObj);
-                            } else {
-                                resultO = cellConfig.getField().get(finalLoopObj);
+//                        XlsAnnotationUtils.setFileValue(targetObj,);
+                    } else {
+                        if (cellConfig.getTargetSetMethod() != null) {
+                            try {
+                                Object resultO = null;
+                                if (cellConfig.getGetMethod() != null) {
+                                    resultO = cellConfig.getGetMethod().invoke(finalLoopObj);
+                                } else {
+                                    resultO = cellConfig.getField().get(finalLoopObj);
+                                }
+
+                                cellConfig.getTargetSetMethod().invoke(targetObj, resultO);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-                            cellConfig.getTargetField().set(targetObj, resultO);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+                        } else if (cellConfig.getTargetField() != null) {
+                            try {
+                                Object resultO = null;
+                                if (cellConfig.getGetMethod() != null) {
+                                    resultO = cellConfig.getGetMethod().invoke(finalLoopObj);
+                                } else {
+                                    resultO = cellConfig.getField().get(finalLoopObj);
+                                }
+                                cellConfig.getTargetField().set(targetObj, resultO);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
+
                 });
                 result.add(targetObj);
             }
