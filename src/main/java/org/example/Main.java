@@ -31,13 +31,13 @@ public class Main {
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
-        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
-        Object o = XlsGlobalUtils.loadData(byteArray);
-        System.out.println(o);
-
-        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
-
-        System.out.println(businessObj);
+//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
+//        Object o = XlsGlobalUtils.loadData(byteArray);
+//        System.out.println(o);
+//
+//        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+//
+//        System.out.println(businessObj);
 
 
     }
