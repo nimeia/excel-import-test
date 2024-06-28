@@ -147,4 +147,26 @@ public class XlsSheetConfig {
     public Method getGetMethod() {
         return getMethod;
     }
+
+    @Override
+    public String toString() {
+        return "XlsSheetConfig{" +
+                "bindClass=" + bindClass +
+                ", ownerClass=" + ownerClass +
+                ", bindField='" + bindField + '\'' +
+                ", isCollection=" + isCollection +
+                ", key='" + key + '\'' +
+                ", title='" + title + '\'' +
+                ", sheetActive=" + sheetActive +
+                ", headRow=" + headRow +
+                ", toClass=" + toClass +
+                ", fillByFiledName=" + fillByFiledName +
+                ", field=" + field +
+                ", setMethod=" + setMethod +
+                ", getMethod=" + getMethod +
+                ", index=" + index +
+                ", hidden=" + hidden +
+                ", xlsCellConfigs=" + xlsCellConfigs +
+                '}';
+    }
 }

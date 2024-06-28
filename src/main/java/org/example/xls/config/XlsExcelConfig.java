@@ -3,6 +3,7 @@ package org.example.xls.config;
 import org.example.vo.XlsExcel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,4 +59,13 @@ public class XlsExcelConfig {
         return category;
     }
 
+    @Override
+    public String toString() {
+        return "XlsExcelConfig{" +
+                "bindClass=" + bindClass +
+                ", title='" + title + '\'' +
+                ", category=" + Arrays.toString(category) +
+                ", sheetConfigs=" + sheetConfigs +
+                '}';
+    }
 }

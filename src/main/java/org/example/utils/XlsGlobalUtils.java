@@ -430,13 +430,14 @@ public class XlsGlobalUtils {
                                     data = co;
                                 }
                             }
-                            Field field = xlsCellConfig.getField();
+                            Field field = xlsCellConfig.getInnerSheetField()!=null ? xlsCellConfig.getInnerSheetField() : xlsCellConfig.getField();
+                            Class<?> aClass = xlsCellConfig.getInnerSheetField()!=null ? xlsCellConfig.getInnerSheetField().getType() :  xlsCellConfig.getCellType();
                             Method setMethod = xlsCellConfig.getSetMethod();
                             // System.out.println(String.format("get cell %s,%s for %s", rowIndex, i, field));
                             // dataMap.put(headFiledNames.get(i), currentRowData.getCell(i).getStringCellValue());
                             Object cellValue = ExcelUtil.getCellValue(currentRowData.getCell(i));
                             if (cellValue != null) {
-                                Class<?> aClass = xlsCellConfig.getCellType();
+
                                 if (cellValue.getClass() == aClass) {
                                     if (setMethod != null) {
                                         setMethod.invoke(data, cellValue);
@@ -632,7 +633,10 @@ public class XlsGlobalUtils {
         List<Method> allTargetSetterMethods = ReflectionUtils.getAllMethods(toClass, f -> f.getName().startsWith("set")).stream().toList();
         List<Method> allTargetGetterMethods = ReflectionUtils.getAllMethods(toClass, f -> f.getName().startsWith("get")).stream().toList();
 
-        List<Field> allFields = new ArrayList<>(ReflectionUtils.getAllFields(bindClass, f -> f.isAnnotationPresent(XlsCell.class)));
+        List<Field> allFields = new ArrayList<>(ReflectionUtils.getAllFields(bindClass, f -> {
+            f.setAccessible(true);
+            return f.isAnnotationPresent(XlsCell.class);
+        }).stream().toList());
         //按类定义排序
         Collections.sort(allFields, (e1, e2) -> XlsAnnotationUtils.getFieldValueForJdk12(e1, "slot", Integer.class) - XlsAnnotationUtils.getFieldValueForJdk12(e2, "slot", Integer.class));
         //按类的定义重排

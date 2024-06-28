@@ -4,6 +4,7 @@ import org.example.vo.XlsCell;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class XlsCellConfig {
@@ -211,5 +212,36 @@ public class XlsCellConfig {
 
     public Method getInnerSheetTargetGetMethod() {
         return innerSheetTargetGetMethod;
+    }
+
+    @Override
+    public String toString() {
+        return "XlsCellConfig{" +
+                "cellType=" + cellType +
+                ", bindClass=" + bindClass +
+                ", bindField='" + bindField + '\'' +
+                ", styleMethod='" + styleMethod + '\'' +
+                ", columnStyleMethod='" + columnStyleMethod + '\'' +
+                ", headTitle=" + Arrays.toString(headTitle) +
+                ", index=" + index +
+                ", toClass=" + toClass +
+                ", toField='" + toField + '\'' +
+                ", field=" + field +
+                ", setMethod=" + setMethod +
+                ", getMethod=" + getMethod +
+                ", targetField=" + targetField +
+                ", targetSetMethod=" + targetSetMethod +
+                ", targetGetMethod=" + targetGetMethod +
+                ", innerSheetToClass=" + innerSheetToClass +
+                ", innerSheetToField='" + innerSheetToField + '\'' +
+                ", innerSheetRowCount=" + innerSheetRowCount +
+                ", innerSheetField=" + innerSheetField +
+                ", innerSheetSetMethod=" + innerSheetSetMethod +
+                ", innerSheetGetMethod=" + innerSheetGetMethod +
+                ", innerSheetTargetField=" + innerSheetTargetField +
+                ", innerSheetTargetSetMethod=" + innerSheetTargetSetMethod +
+                ", innerSheetTargetGetMethod=" + innerSheetTargetGetMethod +
+                ", innerSheetIndex=" + innerSheetIndex +
+                '}';
     }
 }

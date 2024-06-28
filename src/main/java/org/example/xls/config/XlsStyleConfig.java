@@ -63,4 +63,18 @@ public class XlsStyleConfig {
         // 将数据验证应用到工作表
         dataSheet.addValidationData(dataValidation);
     }
+
+    @Override
+    public String toString() {
+        return "XlsStyleConfig{" +
+                "numericValidationFormula='" + numericValidationFormula + '\'' +
+                ", textLengthValidationFormula='" + textLengthValidationFormula + '\'' +
+                ", dateValidationFormula='" + dateValidationFormula + '\'' +
+                ", emailValidationFormula='" + emailValidationFormula + '\'' +
+                ", specificTextValidationFormula='" + specificTextValidationFormula + '\'' +
+                ", integerValidationFormula='" + integerValidationFormula + '\'' +
+                ", phoneNumberValidationFormula='" + phoneNumberValidationFormula + '\'' +
+                ", notEmptyValidationFormula='" + notEmptyValidationFormula + '\'' +
+                '}';
+    }
 }

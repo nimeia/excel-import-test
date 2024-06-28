@@ -17,7 +17,7 @@ public class Sheet2 extends XlsStyleConfig {
     @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组3"}, styleMethod = "headStyle")
     private BigDecimal price;
 
     @XlsCell(headTitle = {"主表ID"}, styleMethod = "headStyle")
@@ -100,5 +100,13 @@ public class Sheet2 extends XlsStyleConfig {
 
     public void setHiddenField(String hiddenField) {
         this.hiddenField = hiddenField;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 }

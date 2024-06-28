@@ -28,6 +28,7 @@ public class Main {
 //        Set<Field> allFields = ReflectionUtils.getAllFields(MainVo.class, (f)->true);
 //        System.out.println(allFields);
 
+        XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
         byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));

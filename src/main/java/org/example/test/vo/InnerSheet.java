@@ -13,6 +13,30 @@ public class InnerSheet {
     @XlsCell(headTitle = {"inner组1", "子组2", "三级组2"})
     private String innerName;
 
-    @XlsCell(headTitle = {"inner组1", "子组1", "三级组2"})
+    @XlsCell(headTitle = {"inner组1", "子组1", "三级组3"})
     private BigDecimal innerPrice;
+
+    public Integer getInnerId() {
+        return innerId;
+    }
+
+    public void setInnerId(Integer innerId) {
+        this.innerId = innerId;
+    }
+
+    public String getInnerName() {
+        return innerName;
+    }
+
+    public void setInnerName(String innerName) {
+        this.innerName = innerName;
+    }
+
+    public BigDecimal getInnerPrice() {
+        return innerPrice;
+    }
+
+    public void setInnerPrice(BigDecimal innerPrice) {
+        this.innerPrice = innerPrice;
+    }
 }
