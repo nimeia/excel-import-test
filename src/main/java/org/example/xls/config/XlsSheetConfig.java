@@ -9,28 +9,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class XlsSheetConfig {
+    /**
+     * field 的类型
+     */
+    private Class<?> fieldTypeClass;
 
+    /**
+     * 真实对象的类型,例如 List<User》 ,bindclass 为user
+     */
     private Class<?> bindClass;
-    private Class<?> ownerClass;
-    private String bindField;
-    private boolean isCollection;
-    private String key;
-    private String title;
-    private boolean sheetActive;
-    private int headRow;
-
     /**
-     * 填充目标对象
-     *
-     * @return
+     * 绑定属性名
      */
-    private Class<?> toClass;
+    private Field bindField;
 
-    private boolean fillByFiledName;
-    /**
-     * 属性field
-     */
-    private Field field;
     /**
      * set method
      */
@@ -39,13 +31,44 @@ public class XlsSheetConfig {
      * get method
      */
     private Method getMethod;
+
+    /**
+     * 主类类型
+     */
+    private Class<?> ownerClass;
+
+    /**
+     * 主类中是否以为集合类
+     */
+    private boolean isCollection;
+    /**
+     * 正文标题
+     */
+    private String title;
+    /**
+     * 是否激活
+     */
+    private boolean sheetActive;
+    /**
+     * 标题行数
+     */
+    private int headRow;
+    /**
+     * 填充目标对象
+     */
+    private Class<?> toClass;
+
+    /**
+     * 是否按属性同名自动转换
+     */
+    private boolean fillByFiledName;
+
     /**
      * excel 中显示位置
      *
      * @return
      */
     private int index;
-
 
     /**
      * 是否隐藏
@@ -59,9 +82,6 @@ public class XlsSheetConfig {
     public XlsSheetConfig(XlsSheet xlsSheet) {
         this.bindClass = xlsSheet.getClass();
         this.ownerClass = xlsSheet.getClass();
-        this.bindField = xlsSheet.bindField();
-        this.isCollection = xlsSheet.isCollection();
-        this.key = xlsSheet.key();
         this.title = xlsSheet.title();
         this.sheetActive = xlsSheet.sheetActive();
         this.headRow = xlsSheet.headRow();
@@ -76,97 +96,147 @@ public class XlsSheetConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         XlsSheetConfig that = (XlsSheetConfig) o;
-        return Objects.equals(bindClass, that.bindClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(bindField, that.bindField);
+        return Objects.equals(bindClass, that.bindClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(bindField.getName(), that.bindField.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bindClass, ownerClass, bindField);
+        return Objects.hash(bindClass, ownerClass, bindField.getName());
     }
 
-    public List<XlsCellConfig> getXlsCellConfigs() {
-        return xlsCellConfigs;
+
+    public Class<?> fieldTypeClass() {
+        return fieldTypeClass;
     }
 
-    public Class<?> getToClass() {
-        return toClass;
+    public XlsSheetConfig fieldTypeClass(Class<?> fieldTypeClass) {
+        this.fieldTypeClass = fieldTypeClass;
+        return this;
     }
 
-    public boolean isFillByFiledName() {
-        return fillByFiledName;
-    }
-
-    public Class<?> getBindClass() {
+    public Class<?> bindClass() {
         return bindClass;
     }
 
-    public Class<?> getOwnerClass() {
+    public XlsSheetConfig bindClass(Class<?> bindClass) {
+        this.bindClass = bindClass;
+        return this;
+    }
+
+    public Class<?> ownerClass() {
         return ownerClass;
     }
 
-    public String getBindField() {
+    public XlsSheetConfig ownerClass(Class<?> ownerClass) {
+        this.ownerClass = ownerClass;
+        return this;
+    }
+
+    public Field bindField() {
         return bindField;
+    }
+
+    public XlsSheetConfig bindField(Field bindField) {
+        this.bindField = bindField;
+        return this;
     }
 
     public boolean isCollection() {
         return isCollection;
     }
 
-    public String getKey() {
-        return key;
+    public XlsSheetConfig isCollection(boolean collection) {
+        isCollection = collection;
+        return this;
     }
 
-    public String getTitle() {
+    public String title() {
         return title;
     }
 
-    public boolean isSheetActive() {
+    public XlsSheetConfig title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public boolean sheetActive() {
         return sheetActive;
     }
 
-    public int getHeadRow() {
+    public XlsSheetConfig sheetActive(boolean sheetActive) {
+        this.sheetActive = sheetActive;
+        return this;
+    }
+
+    public int headRow() {
         return headRow;
     }
 
-    public int getIndex() {
-        return index;
+    public XlsSheetConfig headRow(int headRow) {
+        this.headRow = headRow;
+        return this;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public Class<?> toClass() {
+        return toClass;
     }
 
-    public Field getField() {
-        return field;
+    public XlsSheetConfig toClass(Class<?> toClass) {
+        this.toClass = toClass;
+        return this;
     }
 
-    public Method getSetMethod() {
+    public boolean fillByFiledName() {
+        return fillByFiledName;
+    }
+
+    public XlsSheetConfig fillByFiledName(boolean fillByFiledName) {
+        this.fillByFiledName = fillByFiledName;
+        return this;
+    }
+
+    public Method setMethod() {
         return setMethod;
     }
 
-    public Method getGetMethod() {
+    public XlsSheetConfig setMethod(Method setMethod) {
+        this.setMethod = setMethod;
+        return this;
+    }
+
+    public Method getMethod() {
         return getMethod;
     }
 
-    @Override
-    public String toString() {
-        return "XlsSheetConfig{" +
-                "bindClass=" + bindClass +
-                ", ownerClass=" + ownerClass +
-                ", bindField='" + bindField + '\'' +
-                ", isCollection=" + isCollection +
-                ", key='" + key + '\'' +
-                ", title='" + title + '\'' +
-                ", sheetActive=" + sheetActive +
-                ", headRow=" + headRow +
-                ", toClass=" + toClass +
-                ", fillByFiledName=" + fillByFiledName +
-                ", field=" + field +
-                ", setMethod=" + setMethod +
-                ", getMethod=" + getMethod +
-                ", index=" + index +
-                ", hidden=" + hidden +
-                ", xlsCellConfigs=" + xlsCellConfigs +
-                '}';
+    public XlsSheetConfig getMethod(Method getMethod) {
+        this.getMethod = getMethod;
+        return this;
+    }
+
+    public int index() {
+        return index;
+    }
+
+    public XlsSheetConfig index(int index) {
+        this.index = index;
+        return this;
+    }
+
+    public boolean hidden() {
+        return hidden;
+    }
+
+    public XlsSheetConfig hidden(boolean hidden) {
+        this.hidden = hidden;
+        return this;
+    }
+
+    public List<XlsCellConfig> xlsCellConfigs() {
+        return xlsCellConfigs;
+    }
+
+    public XlsSheetConfig xlsCellConfigs(List<XlsCellConfig> xlsCellConfigs) {
+        this.xlsCellConfigs = xlsCellConfigs;
+        return this;
     }
 }

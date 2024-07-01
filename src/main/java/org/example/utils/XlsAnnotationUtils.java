@@ -15,13 +15,20 @@ public class XlsAnnotationUtils {
 
     public static <T extends Annotation> List<T> getAllInitAnnotations(String[] basePackages, Class<T> tClass) {
         List<T> result = new ArrayList<>();
-        for (Class<?> annotatedClass : getAllClassWithAnnotiaon(basePackages, tClass)) {
+        for (Class<?> annotatedClass : getAllClassWithAnnotation(basePackages, tClass)) {
             result.add(annotatedClass.getAnnotation(tClass));
         }
         return result;
     }
 
-    public static <T extends Annotation> List<Class<?>> getAllClassWithAnnotiaon(String[] basePackages, Class<T> tClass) {
+    /**
+     * get all class with the target annotation
+     * @param basePackages  package to scan
+     * @param tClass the annotation class
+     * @return
+     * @param <T>
+     */
+    public static <T extends Annotation> List<Class<?>> getAllClassWithAnnotation(String[] basePackages, Class<T> tClass) {
         List<XlsExcel> list = new ArrayList<XlsExcel>();
         //get all class with XlsExcel annotation
         // 创建 Reflections 对象，指定要扫描的包
@@ -230,7 +237,7 @@ public class XlsAnnotationUtils {
     }
 
 
-    public static <T> T getFieldValueForJdk12(Object o, String fieldName, Class<T> tClass) {
+    public static <T> T fieldValueForJdk12(Object o, String fieldName, Class<T> tClass) {
         if (o == null) return null;
         try {
             return (T) getField(o.getClass(), fieldName).get(o);
@@ -238,6 +245,19 @@ public class XlsAnnotationUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static Class fieldCollectionRealType(Field field){
+        if(Collection.class.isAssignableFrom(field.getType())){
+            // 当前集合的泛型类型
+            Type genericType = field.getGenericType();
+            ParameterizedType pt = (ParameterizedType) genericType;
+            // 得到泛型里的class类型对象
+            return (Class<?>) pt.getActualTypeArguments()[0];
+        }
+        return void.class;
+    }
+
+
 
     private static Field getField(Class clazz, String fieldName) {
         String key = clazz.getName() + "." + fieldName;

@@ -4,12 +4,13 @@ import org.example.vo.XlsCell;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class XlsCellConfig {
-
-    private Class<?> cellType;
+    /**
+     * field 的类型
+     */
+    private Class<?> fieldTypeClass;
     private Class<?> bindClass;
     private String bindField;
     private String styleMethod;
@@ -20,10 +21,7 @@ public class XlsCellConfig {
     private Class<?> toClass;
 
     private String toField;
-    /**
-     * 属性field
-     */
-    private Field field;
+
     /**
      * set method
      */
@@ -91,7 +89,6 @@ public class XlsCellConfig {
 
 
     public XlsCellConfig(XlsCell xlsCell) {
-        this.cellType = xlsCell.cellType();
         this.bindClass = xlsCell.bindClass();
         this.bindField = xlsCell.bindField();
         this.styleMethod = xlsCell.styleMethod();
@@ -118,130 +115,219 @@ public class XlsCellConfig {
         return Objects.hash(bindClass, bindField);
     }
 
-    public int getInnerSheetIndex() {
-        return innerSheetIndex;
+    public Class<?> fieldTypeClass() {
+        return fieldTypeClass;
     }
 
-    public Field getField() {
-        return field;
+    public XlsCellConfig fieldTypeClass(Class<?> fieldTypeClass) {
+        this.fieldTypeClass = fieldTypeClass;
+        return this;
     }
 
-    public Method getSetMethod() {
-        return setMethod;
-    }
-
-    public Method getGetMethod() {
-        return getMethod;
-    }
-
-    public Class<?> getCellType() {
-        return cellType;
-    }
-
-    public Class<?> getBindClass() {
+    public Class<?> bindClass() {
         return bindClass;
     }
 
-    public String getBindField() {
+    public XlsCellConfig bindClass(Class<?> bindClass) {
+        this.bindClass = bindClass;
+        return this;
+    }
+
+    public String bindField() {
         return bindField;
     }
 
-    public String getStyleMethod() {
+    public XlsCellConfig bindField(String bindField) {
+        this.bindField = bindField;
+        return this;
+    }
+
+    public String styleMethod() {
         return styleMethod;
     }
 
-    public String getColumnStyleMethod() {
+    public XlsCellConfig styleMethod(String styleMethod) {
+        this.styleMethod = styleMethod;
+        return this;
+    }
+
+    public String columnStyleMethod() {
         return columnStyleMethod;
     }
 
-    public String[] getHeadTitle() {
+    public XlsCellConfig columnStyleMethod(String columnStyleMethod) {
+        this.columnStyleMethod = columnStyleMethod;
+        return this;
+    }
+
+    public String[] headTitle() {
         return headTitle;
     }
 
-    public int getIndex() {
+    public XlsCellConfig headTitle(String[] headTitle) {
+        this.headTitle = headTitle;
+        return this;
+    }
+
+    public int index() {
         return index;
     }
 
-    public Field getTargetField() {
-        return targetField;
+    public XlsCellConfig index(int index) {
+        this.index = index;
+        return this;
     }
 
-    public Method getTargetSetMethod() {
-        return targetSetMethod;
-    }
-
-    public Method getTargetGetMethod() {
-        return targetGetMethod;
-    }
-
-    public Class<?> getToClass() {
+    public Class<?> toClass() {
         return toClass;
     }
 
-    public String getToField() {
+    public XlsCellConfig toClass(Class<?> toClass) {
+        this.toClass = toClass;
+        return this;
+    }
+
+    public String toField() {
         return toField;
     }
 
-    public Class<?> getInnerSheetToClass() {
+    public XlsCellConfig toField(String toField) {
+        this.toField = toField;
+        return this;
+    }
+
+    public Method setMethod() {
+        return setMethod;
+    }
+
+    public XlsCellConfig setMethod(Method setMethod) {
+        this.setMethod = setMethod;
+        return this;
+    }
+
+    public Method getMethod() {
+        return getMethod;
+    }
+
+    public XlsCellConfig getMethod(Method getMethod) {
+        this.getMethod = getMethod;
+        return this;
+    }
+
+    public Field targetField() {
+        return targetField;
+    }
+
+    public XlsCellConfig targetField(Field targetField) {
+        this.targetField = targetField;
+        return this;
+    }
+
+    public Method targetSetMethod() {
+        return targetSetMethod;
+    }
+
+    public XlsCellConfig targetSetMethod(Method targetSetMethod) {
+        this.targetSetMethod = targetSetMethod;
+        return this;
+    }
+
+    public Method targetGetMethod() {
+        return targetGetMethod;
+    }
+
+    public XlsCellConfig targetGetMethod(Method targetGetMethod) {
+        this.targetGetMethod = targetGetMethod;
+        return this;
+    }
+
+    public Class<?> innerSheetToClass() {
         return innerSheetToClass;
     }
 
-    public int getInnerSheetRowCount() {
+    public XlsCellConfig innerSheetToClass(Class<?> innerSheetToClass) {
+        this.innerSheetToClass = innerSheetToClass;
+        return this;
+    }
+
+    public String innerSheetToField() {
+        return innerSheetToField;
+    }
+
+    public XlsCellConfig innerSheetToField(String innerSheetToField) {
+        this.innerSheetToField = innerSheetToField;
+        return this;
+    }
+
+    public int innerSheetRowCount() {
         return innerSheetRowCount;
     }
 
-    public Field getInnerSheetField() {
+    public XlsCellConfig innerSheetRowCount(int innerSheetRowCount) {
+        this.innerSheetRowCount = innerSheetRowCount;
+        return this;
+    }
+
+    public Field innerSheetField() {
         return innerSheetField;
     }
 
-    public Method getInnerSheetSetMethod() {
+    public XlsCellConfig innerSheetField(Field innerSheetField) {
+        this.innerSheetField = innerSheetField;
+        return this;
+    }
+
+    public Method innerSheetSetMethod() {
         return innerSheetSetMethod;
     }
 
-    public Method getInnerSheetGetMethod() {
+    public XlsCellConfig innerSheetSetMethod(Method innerSheetSetMethod) {
+        this.innerSheetSetMethod = innerSheetSetMethod;
+        return this;
+    }
+
+    public Method innerSheetGetMethod() {
         return innerSheetGetMethod;
     }
 
-    public Field getInnerSheetTargetField() {
+    public XlsCellConfig innerSheetGetMethod(Method innerSheetGetMethod) {
+        this.innerSheetGetMethod = innerSheetGetMethod;
+        return this;
+    }
+
+    public Field innerSheetTargetField() {
         return innerSheetTargetField;
     }
 
-    public Method getInnerSheetTargetSetMethod() {
+    public XlsCellConfig innerSheetTargetField(Field innerSheetTargetField) {
+        this.innerSheetTargetField = innerSheetTargetField;
+        return this;
+    }
+
+    public Method innerSheetTargetSetMethod() {
         return innerSheetTargetSetMethod;
     }
 
-    public Method getInnerSheetTargetGetMethod() {
+    public XlsCellConfig innerSheetTargetSetMethod(Method innerSheetTargetSetMethod) {
+        this.innerSheetTargetSetMethod = innerSheetTargetSetMethod;
+        return this;
+    }
+
+    public Method innerSheetTargetGetMethod() {
         return innerSheetTargetGetMethod;
     }
 
-    @Override
-    public String toString() {
-        return "XlsCellConfig{" +
-                "cellType=" + cellType +
-                ", bindClass=" + bindClass +
-                ", bindField='" + bindField + '\'' +
-                ", styleMethod='" + styleMethod + '\'' +
-                ", columnStyleMethod='" + columnStyleMethod + '\'' +
-                ", headTitle=" + Arrays.toString(headTitle) +
-                ", index=" + index +
-                ", toClass=" + toClass +
-                ", toField='" + toField + '\'' +
-                ", field=" + field +
-                ", setMethod=" + setMethod +
-                ", getMethod=" + getMethod +
-                ", targetField=" + targetField +
-                ", targetSetMethod=" + targetSetMethod +
-                ", targetGetMethod=" + targetGetMethod +
-                ", innerSheetToClass=" + innerSheetToClass +
-                ", innerSheetToField='" + innerSheetToField + '\'' +
-                ", innerSheetRowCount=" + innerSheetRowCount +
-                ", innerSheetField=" + innerSheetField +
-                ", innerSheetSetMethod=" + innerSheetSetMethod +
-                ", innerSheetGetMethod=" + innerSheetGetMethod +
-                ", innerSheetTargetField=" + innerSheetTargetField +
-                ", innerSheetTargetSetMethod=" + innerSheetTargetSetMethod +
-                ", innerSheetTargetGetMethod=" + innerSheetTargetGetMethod +
-                ", innerSheetIndex=" + innerSheetIndex +
-                '}';
+    public XlsCellConfig innerSheetTargetGetMethod(Method innerSheetTargetGetMethod) {
+        this.innerSheetTargetGetMethod = innerSheetTargetGetMethod;
+        return this;
+    }
+
+    public int innerSheetIndex() {
+        return innerSheetIndex;
+    }
+
+    public XlsCellConfig innerSheetIndex(int innerSheetIndex) {
+        this.innerSheetIndex = innerSheetIndex;
+        return this;
     }
 }

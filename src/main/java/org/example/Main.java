@@ -1,5 +1,6 @@
 package org.example;
 
+//import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.IOUtils;
 import org.example.test.vo.MainVo;
 import org.example.utils.XlsGlobalUtils;
@@ -31,13 +32,13 @@ public class Main {
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
-//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
-//        Object o = XlsGlobalUtils.loadData(byteArray);
-//        System.out.println(o);
+        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
+        Object o = XlsGlobalUtils.loadData(byteArray);
+        System.out.println(o);
 //
-//        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
 //
-//        System.out.println(businessObj);
+        System.out.println(businessObj);
 
 
     }

@@ -7,20 +7,22 @@ import java.lang.annotation.*;
 @Inherited
 public @interface XlsSheet {
 
-    Class<?> bindClass() default void.class;
-
-    Class<?> ownerClass() default void.class;
-
-    String bindField() default "";
-
-    boolean isCollection() default false;
-
-    String key() default "sheet";
-
+    /**
+     * sheet 标题,excel 下方的名称
+     * @return
+     */
     String title() default "";
 
+    /**
+     * 是否默认激活
+     * @return
+     */
     boolean sheetActive() default false;
 
+    /**
+     * 标题行数，会自动计算
+     * @return
+     */
     int headRow() default 1;
 
     /**
@@ -28,7 +30,7 @@ public @interface XlsSheet {
      *
      * @return
      */
-    int index() default -1;
+    int index() ;
 
     /**
      * 是否隐藏
@@ -44,5 +46,9 @@ public @interface XlsSheet {
      */
     Class<?> toClass() default void.class;
 
+    /**
+     * 是否按字段名，默认转换
+     * @return
+     */
     boolean fillByFiledName() default true;
 }

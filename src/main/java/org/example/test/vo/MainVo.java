@@ -2,6 +2,7 @@ package org.example.test.vo;
 
 import org.example.vo.XlsExcel;
 import org.example.vo.XlsIgnore;
+import org.example.vo.XlsIndex;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class MainVo extends BaseVo {
     @XlsIgnore
     Sheet1 sheet1;
 
+    @XlsIndex(index = 0)
     List<Sheet2> sheet2List;
 
     Map<?, ?> map;

@@ -10,13 +10,13 @@ import java.util.Date;
 @XlsSheet(index = 1, hidden = false, title = "Sheet 样例2", toClass = BusinessSheet1.class)
 public class SheetBase {
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 0, headTitle = {"组1", "子组2", "三级组2"})
     private Integer id;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 1, headTitle = {"组1", "子组2", "三级组2"})
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 2, headTitle = {"组1", "子组2", "三级组2"})
     private BigDecimal price;
 
     @XlsCell(index = 3)
@@ -28,7 +28,7 @@ public class SheetBase {
     @XlsCell(index = 5)
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"})
+    @XlsCell(index = 6, headTitle = {"隐藏列"})
     private String hiddenField;
 
     public Integer getId() {

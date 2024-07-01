@@ -11,13 +11,13 @@ import java.util.Date;
 @XlsSheet(index = 1, hidden = false, title = "Sheet 样例1", toClass = BusinessSheet1.class)
 public class Sheet1 extends XlsStyleConfig {
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组1"}, styleMethod = "headStyle")
+    @XlsCell(index = 1, headTitle = {"组1", "子组2", "三级组1"}, styleMethod = "headStyle")
     private Integer id;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
+    @XlsCell(index = 2, headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
+    @XlsCell(index = 6, headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
     private BigDecimal price;
 
     @XlsCell(index = 3, styleMethod = "headStyle")
@@ -29,7 +29,7 @@ public class Sheet1 extends XlsStyleConfig {
     @XlsCell(index = 5, styleMethod = "headStyle")
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle")
+    @XlsCell(index = 7, headTitle = {"隐藏列"}, styleMethod = "headStyle")
     private String hiddenField;
 
 

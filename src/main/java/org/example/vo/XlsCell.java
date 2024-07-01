@@ -20,7 +20,7 @@ public @interface XlsCell {
 
     String[] headTitle() default {};
 
-    int index() default -1;
+    int index() ;
 
     Class<?> innerSheetToClass() default void.class;
 

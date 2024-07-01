@@ -11,31 +11,31 @@ import java.util.Date;
 @XlsSheet(index = 1, hidden = false, title = "Sheet 样例3", toClass = BusinessSheet2.class)
 public class Sheet2 extends XlsStyleConfig {
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组1"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组1"},index = 1, styleMethod = "headStyle")
     private Integer id;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"},index = 2, styleMethod = "headStyle")
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组3"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组3"},index = 3, styleMethod = "headStyle")
     private BigDecimal price;
 
-    @XlsCell(headTitle = {"主表ID"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"主表ID"}, index = 4, styleMethod = "headStyle")
     private Integer parentId;
 
-    @XlsCell(index = 3, styleMethod = "headStyle")
+    @XlsCell(index = 5, styleMethod = "headStyle")
     private String email;
 
-    @XlsCell(index = 4, styleMethod = "headStyle", columnStyleMethod = "dateStyle")
+    @XlsCell(index = 6, styleMethod = "headStyle", columnStyleMethod = "dateStyle")
     private Date birthDate;
 
-    @XlsCell(index = 5, styleMethod = "headStyle")
+    @XlsCell(index = 7, styleMethod = "headStyle")
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle",index = 8)
     private String hiddenField;
 
-    @XlsCell(index = 6, styleMethod = "headStyle", innerSheetRowCount = 3)
+    @XlsCell(index = 9, styleMethod = "headStyle", innerSheetRowCount = 3)
     private InnerSheet innerSheet;
 
     public InnerSheet getInnerSheet() {
