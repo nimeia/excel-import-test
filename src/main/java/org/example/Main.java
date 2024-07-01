@@ -4,9 +4,11 @@ package org.example;
 import org.apache.poi.util.IOUtils;
 import org.example.test.vo.MainVo;
 import org.example.utils.XlsGlobalUtils;
+import org.example.xls.config.XlsCellConfig;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -30,6 +32,7 @@ public class Main {
 //        System.out.println(allFields);
 
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
+        List<XlsCellConfig> xlsCellConfigs = XlsGlobalUtils.allExcelConfigs.values().iterator().next().sheetConfigs().get(0).xlsCellConfigs();
         XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
         byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));

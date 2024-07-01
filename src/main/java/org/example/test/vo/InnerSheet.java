@@ -10,7 +10,7 @@ public class InnerSheet {
     @XlsCell(index = 1, headTitle = {"inner组1", "子组2", "三级组1"})
     private Integer innerId;
 
-    @XlsCell(index = 2, headTitle = {"inner组1", "子组2", "三级组2"})
+    @XlsCell(index = 2, headTitle = {"inner组1", "子组2", "三级组2"},toField = "name")
     private String innerName;
 
     @XlsCell(index = 3, headTitle = {"inner组1", "子组1", "三级组3"})

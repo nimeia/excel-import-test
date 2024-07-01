@@ -44,11 +44,6 @@ public @interface XlsSheet {
      *
      * @return
      */
-    Class<?> toClass() default void.class;
+    Class<?> toClass();
 
-    /**
-     * 是否按字段名，默认转换
-     * @return
-     */
-    boolean fillByFiledName() default true;
 }

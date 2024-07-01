@@ -8,12 +8,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface XlsCell {
 
-    Class<?> cellType() default void.class;
-
-    Class<?> bindClass() default void.class;
-
-    String bindField() default "";
-
     String styleMethod() default "";
 
     String columnStyleMethod() default "";
@@ -27,14 +21,6 @@ public @interface XlsCell {
     String innerSheetToField() default "";
 
     int innerSheetRowCount() default 1;
-
-
-    /**
-     * 属于哪个类
-     *
-     * @return
-     */
-    Class<?> toClass() default void.class;
 
     /**
      * 属于哪个类的哪个属性

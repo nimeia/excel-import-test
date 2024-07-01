@@ -1,5 +1,6 @@
 package org.example.test.vo;
 
+import org.example.business.BusinessInnerSheet;
 import org.example.business.BusinessSheet2;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
@@ -35,7 +36,7 @@ public class Sheet2 extends XlsStyleConfig {
     @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle",index = 8)
     private String hiddenField;
 
-    @XlsCell(index = 9, styleMethod = "headStyle", innerSheetRowCount = 3)
+    @XlsCell(index = 9, styleMethod = "headStyle", innerSheetRowCount = 3,innerSheetToClass = BusinessInnerSheet.class, toField = "businessInnerSheet")
     private InnerSheet innerSheet;
 
     public InnerSheet getInnerSheet() {

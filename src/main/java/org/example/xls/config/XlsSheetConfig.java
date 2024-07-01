@@ -10,18 +10,13 @@ import java.util.Objects;
 
 public class XlsSheetConfig {
     /**
-     * field 的类型
-     */
-    private Class<?> fieldTypeClass;
-
-    /**
      * 真实对象的类型,例如 List<User》 ,bindclass 为user
      */
-    private Class<?> bindClass;
+    private Class<?> fieldRealTypeClass;
     /**
      * 绑定属性名
      */
-    private Field bindField;
+    private Field field;
 
     /**
      * set method
@@ -59,11 +54,6 @@ public class XlsSheetConfig {
     private Class<?> toClass;
 
     /**
-     * 是否按属性同名自动转换
-     */
-    private boolean fillByFiledName;
-
-    /**
      * excel 中显示位置
      *
      * @return
@@ -80,7 +70,7 @@ public class XlsSheetConfig {
     private List<XlsCellConfig> xlsCellConfigs = new ArrayList<XlsCellConfig>();
 
     public XlsSheetConfig(XlsSheet xlsSheet) {
-        this.bindClass = xlsSheet.getClass();
+        this.fieldRealTypeClass = xlsSheet.getClass();
         this.ownerClass = xlsSheet.getClass();
         this.title = xlsSheet.title();
         this.sheetActive = xlsSheet.sheetActive();
@@ -88,7 +78,6 @@ public class XlsSheetConfig {
         this.index = xlsSheet.index();
         this.hidden = xlsSheet.hidden();
         this.toClass = xlsSheet.toClass();
-        this.fillByFiledName = xlsSheet.fillByFiledName();
     }
 
     @Override
@@ -96,30 +85,21 @@ public class XlsSheetConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         XlsSheetConfig that = (XlsSheetConfig) o;
-        return Objects.equals(bindClass, that.bindClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(bindField.getName(), that.bindField.getName());
+        return Objects.equals(fieldRealTypeClass, that.fieldRealTypeClass) && Objects.equals(ownerClass, that.ownerClass) && Objects.equals(field.getName(), that.field.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bindClass, ownerClass, bindField.getName());
+        return Objects.hash(fieldRealTypeClass, ownerClass, field.getName());
     }
 
 
-    public Class<?> fieldTypeClass() {
-        return fieldTypeClass;
+    public Class<?> fieldRealTypeClass() {
+        return fieldRealTypeClass;
     }
 
-    public XlsSheetConfig fieldTypeClass(Class<?> fieldTypeClass) {
-        this.fieldTypeClass = fieldTypeClass;
-        return this;
-    }
-
-    public Class<?> bindClass() {
-        return bindClass;
-    }
-
-    public XlsSheetConfig bindClass(Class<?> bindClass) {
-        this.bindClass = bindClass;
+    public XlsSheetConfig fieldRealTypeClass(Class<?> bindClass) {
+        this.fieldRealTypeClass = bindClass;
         return this;
     }
 
@@ -132,12 +112,12 @@ public class XlsSheetConfig {
         return this;
     }
 
-    public Field bindField() {
-        return bindField;
+    public Field field() {
+        return field;
     }
 
-    public XlsSheetConfig bindField(Field bindField) {
-        this.bindField = bindField;
+    public XlsSheetConfig field(Field field) {
+        this.field = field;
         return this;
     }
 
@@ -183,15 +163,6 @@ public class XlsSheetConfig {
 
     public XlsSheetConfig toClass(Class<?> toClass) {
         this.toClass = toClass;
-        return this;
-    }
-
-    public boolean fillByFiledName() {
-        return fillByFiledName;
-    }
-
-    public XlsSheetConfig fillByFiledName(boolean fillByFiledName) {
-        this.fillByFiledName = fillByFiledName;
         return this;
     }
 

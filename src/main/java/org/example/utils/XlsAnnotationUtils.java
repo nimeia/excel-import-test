@@ -1,6 +1,8 @@
 package org.example.utils;
 
+import org.example.vo.XlsCell;
 import org.example.vo.XlsExcel;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
@@ -75,12 +77,22 @@ public class XlsAnnotationUtils {
         }
     }
 
+
+    public static String buildSetterName(String fieldName) {
+        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
+    public static String buildGetterName(String fieldName) {
+        return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
     /**
      * @param clazz
      * @param propertyName
      * @return
      */
     public static Method getSetterMethod(Class<?> clazz, String propertyName) {
+        if(propertyName==null || "".equals(propertyName)) throw new RuntimeException("propertyName is null!");
         String methodName = "set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
         return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(e -> e.getName().equals(methodName))
@@ -89,6 +101,7 @@ public class XlsAnnotationUtils {
     }
 
     public static Method getGetterMethod(Class<?> clazz, String propertyName) {
+        if(propertyName==null || "".equals(propertyName)) throw new RuntimeException("propertyName is null!");
         String methodName = "get" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
         return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(e -> e.getName().equals(methodName))
@@ -254,7 +267,7 @@ public class XlsAnnotationUtils {
             // 得到泛型里的class类型对象
             return (Class<?>) pt.getActualTypeArguments()[0];
         }
-        return void.class;
+        return null;
     }
 
 
@@ -283,4 +296,15 @@ public class XlsAnnotationUtils {
         });
     }
 
+    public static boolean fieldContainsXlsCell(Class clazz) {
+        return ReflectionUtils.getAllFields(clazz).stream().anyMatch(f->f.isAnnotationPresent(XlsCell.class));
+    }
+
+    public static Field getFieldByName(Class<?> clazz, String field) {
+        return ReflectionUtils.getAllFields(clazz).stream().filter(f ->f.getName().equals(field)).findFirst().orElse(null);
+    }
+
+    public static boolean isNotEmptyStr(String toFieldName) {
+        return toFieldName!=null && !"".equals(toFieldName.trim());
+    }
 }

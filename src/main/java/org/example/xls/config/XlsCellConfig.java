@@ -10,13 +10,13 @@ public class XlsCellConfig {
     /**
      * field 的类型
      */
-    private Class<?> fieldTypeClass;
-    private Class<?> bindClass;
-    private String bindField;
+    private Class<?> fieldRealTypeClass;
+    private Field field;
     private String styleMethod;
     private String columnStyleMethod;
     private String[] headTitle;
     private int index;
+    private boolean isArray;
 
     private Class<?> toClass;
 
@@ -89,13 +89,10 @@ public class XlsCellConfig {
 
 
     public XlsCellConfig(XlsCell xlsCell) {
-        this.bindClass = xlsCell.bindClass();
-        this.bindField = xlsCell.bindField();
         this.styleMethod = xlsCell.styleMethod();
         this.columnStyleMethod = xlsCell.columnStyleMethod();
         this.headTitle = xlsCell.headTitle();
         this.index = xlsCell.index();
-        this.toClass = xlsCell.toClass();
         this.toField = xlsCell.toField();
         this.innerSheetToClass = xlsCell.innerSheetToClass();
         this.innerSheetRowCount = xlsCell.innerSheetRowCount();
@@ -107,38 +104,38 @@ public class XlsCellConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         XlsCellConfig that = (XlsCellConfig) o;
-        return Objects.equals(bindClass, that.bindClass) && Objects.equals(bindField, that.bindField);
+        return Objects.equals(fieldRealTypeClass, that.fieldRealTypeClass) && Objects.equals(field, that.field);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bindClass, bindField);
+        return Objects.hash(fieldRealTypeClass, field);
     }
 
-    public Class<?> fieldTypeClass() {
-        return fieldTypeClass;
+    public boolean isArray() {
+        return isArray;
     }
 
-    public XlsCellConfig fieldTypeClass(Class<?> fieldTypeClass) {
-        this.fieldTypeClass = fieldTypeClass;
+    public XlsCellConfig isArray(boolean array) {
+        isArray = array;
         return this;
     }
 
-    public Class<?> bindClass() {
-        return bindClass;
+    public Class<?> fieldRealTypeClass() {
+        return fieldRealTypeClass;
     }
 
-    public XlsCellConfig bindClass(Class<?> bindClass) {
-        this.bindClass = bindClass;
+    public XlsCellConfig fieldRealTypeClass(Class<?> bindClass) {
+        this.fieldRealTypeClass = bindClass;
         return this;
     }
 
-    public String bindField() {
-        return bindField;
+    public Field field() {
+        return field;
     }
 
-    public XlsCellConfig bindField(String bindField) {
-        this.bindField = bindField;
+    public XlsCellConfig field(Field bindField) {
+        this.field = bindField;
         return this;
     }
 
