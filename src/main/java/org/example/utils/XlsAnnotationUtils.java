@@ -301,7 +301,11 @@ public class XlsAnnotationUtils {
     }
 
     public static Field getFieldByName(Class<?> clazz, String field) {
-        return ReflectionUtils.getAllFields(clazz).stream().filter(f ->f.getName().equals(field)).findFirst().orElse(null);
+        Field field1 = ReflectionUtils.getAllFields(clazz).stream().filter(f -> f.getName().equals(field)).findFirst().orElse(null);
+        if(field1!=null){
+            field1.setAccessible(true);
+        }
+        return field1;
     }
 
     public static boolean isNotEmptyStr(String toFieldName) {

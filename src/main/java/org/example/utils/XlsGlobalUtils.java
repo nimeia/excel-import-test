@@ -154,7 +154,7 @@ public class XlsGlobalUtils {
                         xlsSheetConfig.isCollection(true);
                     }
                     //初始化cell 配置
-                    Class realClass = XlsAnnotationUtils.fieldCollectionRealType(sheetField);
+                    Class<?> realClass = XlsAnnotationUtils.fieldCollectionRealType(sheetField);
                     if(realClass == null) realClass = sheetField.getType();
                     initSheetCells(realClass, xlsSheetConfig);
                 }
@@ -212,9 +212,7 @@ public class XlsGlobalUtils {
                         Cell cell = row.createCell(i);
                         XlsCellConfig xlsCell = xlsCells.get(i);
                         int index = (xlsSheet.headRow() - xlsCell.headTitle().length) - j >= 0 ? 0 : j - (xlsSheet.headRow() - xlsCell.headTitle().length);
-//                        System.out.println(xlsSheet.headRow()+","+xlsCell.headTitle().length+","+j+","+i+","+index);
                         String value =/*xlsCell.bindField()+"-"+xlsCell.index()+"-"+*/xlsCell.headTitle()[index];
-//                        System.out.println(i+":"+j+"-"+value);
                         cell.setCellValue(value);
 
                         if (cell.getCellComment() == null) {
@@ -230,7 +228,7 @@ public class XlsGlobalUtils {
                             anchor.setRow2(cell.getRowIndex() + 2);
 
                             // 创建批注对象
-//                            if(j == xlsSheet.headRow()-1){
+//                          if(j == xlsSheet.headRow()-1){
                                 Comment comment = drawing.createCellComment(anchor);
                                 RichTextString str = null;
                                 if(xlsCell.innerSheetField()!=null){
@@ -244,7 +242,7 @@ public class XlsGlobalUtils {
                                 comment.setVisible(false);
                                 // 设置批注到单元格
                                 cell.setCellComment(comment);
-//                            }
+//                           }
 
                         }
                         if (!xlsCell.headStyle().equals("")) {
@@ -340,21 +338,21 @@ public class XlsGlobalUtils {
                     //header 处理
                     Row row = dataSheet.getRow(xlsSheet.headRow() - 1);
                     int headLastCellNum = row.getLastCellNum();
-//                    List<Field> fieldList = new ArrayList<>();
-                    List<XlsCellConfig> xlsCellList = xlsSheet.xlsCellConfigs();//new ArrayList<>();
+
+                    List<XlsCellConfig> xlsCellList = xlsSheet.xlsCellConfigs();
                     //检查是否有乱序
                     for (int i = 0; i < headLastCellNum; i++) {
                         String fileName = row.getCell(i).getCellComment().getString().getString();
                         XlsCellConfig xlsCellConfig = xlsCellList.get(i);
-                        if (!xlsCellConfig.field().equals(fileName)) {
-                            throw new RuntimeException("模板配置字段顺序不一致，请检查！" + fileName);
+                        if (xlsCellConfig.innerSheetField() != null) {
+                            if (!xlsCellConfig.innerSheetField().getName().equals(fileName)) {
+                                throw new RuntimeException("模板配置字段顺序不一致，请检查！" + fileName);
+                            }
+                        } else {
+                            if (!xlsCellConfig.field().getName().equals(fileName)) {
+                                throw new RuntimeException("模板配置字段顺序不一致，请检查！" + fileName);
+                            }
                         }
-
-                        // XlsCellConfig xlsCell = xlsCells.stream().filter(e -> e.bindField().equals(fileName)).findFirst().orElse(null);
-                        // Field e = allCellFields.get(xlsCell);
-//                        Field e = xlsCell.field();
-//                        fieldList.add(e);
-//                        xlsCellList.add(xlsCell);
                     }
 
                     for (int rowIndex = xlsSheet.headRow(); rowIndex <= lastRowNum; rowIndex++) {
@@ -378,7 +376,7 @@ public class XlsGlobalUtils {
                                     }
                                     // 计算当前是第几个
                                     if (xlsCellConfig.innerSheetIndex() > ((Collection<?>) co).size()) {
-                                        data = xlsCellConfig.innerSheetToClass().getDeclaredConstructor().newInstance();
+                                        data = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
                                         ((Collection) co).add(data);
                                     } else {
                                         data = ((Collection<?>) co).toArray()[xlsCellConfig.innerSheetIndex()];
@@ -387,7 +385,7 @@ public class XlsGlobalUtils {
                                 } else {
                                     Object co = xlsCellConfig.field().get(mainSheetData);
                                     if (co == null) {
-                                        Object o = xlsCellConfig.innerSheetToClass().getDeclaredConstructor().newInstance();
+                                        Object o = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
                                         co = o;
                                         xlsCellConfig.field().set(mainSheetData, co);
                                     }
@@ -396,7 +394,7 @@ public class XlsGlobalUtils {
                             }
                             Field field = xlsCellConfig.innerSheetField()!=null ? xlsCellConfig.innerSheetField() : xlsCellConfig.field();
                             Class<?> aClass = xlsCellConfig.innerSheetField()!=null ? xlsCellConfig.innerSheetField().getType() :  xlsCellConfig.fieldRealTypeClass();
-                            Method setMethod = xlsCellConfig.setMethod();
+                            Method setMethod = xlsCellConfig.innerSheetSetMethod()!=null ? xlsCellConfig.innerSheetSetMethod() :xlsCellConfig.setMethod();
                             // System.out.println(String.format("get cell %s,%s for %s", rowIndex, i, field));
                             // dataMap.put(headFiledNames.get(i), currentRowData.getCell(i).getStringCellValue());
                             Object cellValue = ExcelUtil.getCellValue(currentRowData.getCell(i));
