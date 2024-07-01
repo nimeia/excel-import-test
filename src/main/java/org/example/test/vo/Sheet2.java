@@ -4,39 +4,38 @@ import org.example.business.BusinessInnerSheet;
 import org.example.business.BusinessSheet2;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
-import org.example.xls.config.XlsStyleConfig;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @XlsSheet(index = 1, hidden = false, title = "Sheet 样例3", toClass = BusinessSheet2.class)
-public class Sheet2 extends XlsStyleConfig {
+public class Sheet2 {
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组1"},index = 1, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组1"},index = 1, headStyle = "headStyle",validation = "Integer")
     private Integer id;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组2"},index = 2, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组2"},index = 2, headStyle = "headStyle")
     private String name;
 
-    @XlsCell(headTitle = {"组1", "子组2", "三级组3"},index = 3, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"组1", "子组2", "三级组3"},index = 3, headStyle = "headStyle")
     private BigDecimal price;
 
-    @XlsCell(headTitle = {"主表ID"}, index = 4, styleMethod = "headStyle")
+    @XlsCell(headTitle = {"主表ID"}, index = 4, headStyle = "headStyle")
     private Integer parentId;
 
-    @XlsCell(index = 5, styleMethod = "headStyle")
+    @XlsCell(index = 5, headStyle = "headStyle")
     private String email;
 
-    @XlsCell(index = 6, styleMethod = "headStyle", columnStyleMethod = "dateStyle")
+    @XlsCell(index = 6, headStyle = "headStyle", validation = "dateStyle")
     private Date birthDate;
 
-    @XlsCell(index = 7, styleMethod = "headStyle")
+    @XlsCell(index = 7, headStyle = "headStyle")
     private String idCard;
 
-    @XlsCell(headTitle = {"隐藏列"}, styleMethod = "headStyle",index = 8)
+    @XlsCell(headTitle = {"隐藏列"}, headStyle = "headStyle",index = 8)
     private String hiddenField;
 
-    @XlsCell(index = 9, styleMethod = "headStyle", innerSheetRowCount = 3,innerSheetToClass = BusinessInnerSheet.class, toField = "businessInnerSheet")
+    @XlsCell(index = 9, headStyle = "headStyle", innerSheetRowCount = 3,innerSheetToClass = BusinessInnerSheet.class, toField = "businessInnerSheet")
     private InnerSheet innerSheet;
 
     public InnerSheet getInnerSheet() {

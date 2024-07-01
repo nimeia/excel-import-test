@@ -12,8 +12,8 @@ public class XlsCellConfig {
      */
     private Class<?> fieldRealTypeClass;
     private Field field;
-    private String styleMethod;
-    private String columnStyleMethod;
+    private String headStyle;
+    private String validation;
     private String[] headTitle;
     private int index;
     private boolean isArray;
@@ -87,10 +87,9 @@ public class XlsCellConfig {
      */
     private int innerSheetIndex;
 
-
     public XlsCellConfig(XlsCell xlsCell) {
-        this.styleMethod = xlsCell.styleMethod();
-        this.columnStyleMethod = xlsCell.columnStyleMethod();
+        this.headStyle = xlsCell.headStyle();
+        this.validation = xlsCell.validation();
         this.headTitle = xlsCell.headTitle();
         this.index = xlsCell.index();
         this.toField = xlsCell.toField();
@@ -139,21 +138,21 @@ public class XlsCellConfig {
         return this;
     }
 
-    public String styleMethod() {
-        return styleMethod;
+    public String headStyle() {
+        return headStyle;
     }
 
-    public XlsCellConfig styleMethod(String styleMethod) {
-        this.styleMethod = styleMethod;
+    public XlsCellConfig headStyle(String styleMethod) {
+        this.headStyle = styleMethod;
         return this;
     }
 
-    public String columnStyleMethod() {
-        return columnStyleMethod;
+    public String validation() {
+        return validation;
     }
 
-    public XlsCellConfig columnStyleMethod(String columnStyleMethod) {
-        this.columnStyleMethod = columnStyleMethod;
+    public XlsCellConfig validation(String columnStyleMethod) {
+        this.validation = columnStyleMethod;
         return this;
     }
 

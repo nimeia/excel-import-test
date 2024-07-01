@@ -14,6 +14,12 @@ import java.util.List;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
+    /**
+     *    * 动态设置注解内容，module java 需要配置 JAVA_TOOL_OPTIONS: --add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED
+     *      * --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED  --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
 //        List<XlsExcel> allXlsExcels = XlsAnnotationUtils.getAllInitAnnotations(new String[]{"org.example"}, XlsExcel.class);
@@ -23,6 +29,8 @@ public class Main {
 //        for (XlsExcel xlsExcel : allXlsExcels) {
 //            System.out.println(xlsExcel);
 //        }
+
+        XlsGlobalUtils.loadStyleAndValidation(new String[]{"org.example"});
         XlsGlobalUtils.init(new String[]{"org.example"});
 //        System.out.println(XlsGlobalUtils.allCategories);
 //        System.out.println(XlsGlobalUtils.allExcelConfigs);
