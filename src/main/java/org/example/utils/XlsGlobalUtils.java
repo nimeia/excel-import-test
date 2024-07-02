@@ -531,45 +531,47 @@ public class XlsGlobalUtils {
                 Object finalLoopObj = loopObj;
                 sheetConfig.xlsCellConfigs().forEach(cellConfig -> {
                     if (cellConfig.innerSheetField() != null) {
-                        Object innerSheetObj = XlsAnnotationUtils.initField(targetObj, cellConfig.field(), cellConfig.setMethod(), cellConfig.getMethod());
-
-//                        XlsAnnotationUtils.setFileValue(targetObj,);
+                        int index = cellConfig.innerSheetIndex();
+                        Object innerSheetObj = XlsAnnotationUtils.initField(targetObj,
+                                cellConfig.targetField(),
+                                cellConfig.targetSetMethod(),
+                                cellConfig.targetGetMethod(),
+                                index);
+                        Object resultO = XlsAnnotationUtils.getFieldValue(finalLoopObj,
+                                cellConfig.field(),
+                                cellConfig.getMethod(),
+                                cellConfig.innerSheetField(),
+                                cellConfig.innerSheetGetMethod(),
+                                index);
+                        XlsAnnotationUtils.setFileValue(innerSheetObj,
+                                resultO,
+                                cellConfig.innerSheetField(),
+                                cellConfig.innerSheetSetMethod(),
+                                cellConfig.innerSheetTargetField(),
+                                cellConfig.innerSheetTargetSetMethod(),
+                                index);
                     } else {
-                        if (cellConfig.targetSetMethod() != null) {
-                            try {
-                                Object resultO = null;
-                                if (cellConfig.getMethod() != null) {
-                                    resultO = cellConfig.getMethod().invoke(finalLoopObj);
-                                } else {
-                                    resultO = cellConfig.field().get(finalLoopObj);
-                                }
-
-                                cellConfig.targetSetMethod().invoke(targetObj, resultO);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else if (cellConfig.targetField() != null) {
-                            try {
-                                Object resultO = null;
-                                if (cellConfig.getMethod() != null) {
-                                    resultO = cellConfig.getMethod().invoke(finalLoopObj);
-                                } else {
-                                    resultO = cellConfig.field().get(finalLoopObj);
-                                }
-                                cellConfig.targetField().set(targetObj, resultO);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
+                        Object resultO = XlsAnnotationUtils.getFieldValue(finalLoopObj,
+                                cellConfig.field(),
+                                cellConfig.getMethod(),
+                                cellConfig.innerSheetField(),
+                                cellConfig.innerSheetGetMethod(),
+                                null);
+                        XlsAnnotationUtils.setFileValue(targetObj,
+                                resultO,
+                                cellConfig.targetField(),
+                                cellConfig.targetSetMethod(),
+                                cellConfig.innerSheetTargetField(),
+                                cellConfig.innerSheetTargetSetMethod(),
+                                null);
                     }
-
                 });
                 result.add(targetObj);
             }
 
             if (!collectionFlag && !result.isEmpty()) return Map.of(sheetConfig, result.get(0));
-
             return Map.of(sheetConfig, result);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

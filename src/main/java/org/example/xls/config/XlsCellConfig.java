@@ -18,8 +18,6 @@ public class XlsCellConfig {
     private int index;
     private boolean isArray;
 
-    private Class<?> toClass;
-
     private String toField;
 
     /**
@@ -171,15 +169,6 @@ public class XlsCellConfig {
 
     public XlsCellConfig index(int index) {
         this.index = index;
-        return this;
-    }
-
-    public Class<?> toClass() {
-        return toClass;
-    }
-
-    public XlsCellConfig toClass(Class<?> toClass) {
-        this.toClass = toClass;
         return this;
     }
 

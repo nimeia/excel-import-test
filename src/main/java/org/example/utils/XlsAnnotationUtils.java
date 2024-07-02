@@ -126,18 +126,19 @@ public class XlsAnnotationUtils {
 
     /**
      * 初始化 filed
+     *
      * @param targetObj
      * @param field
+     * @param i
      * @return
      */
-    public static Object initField(Object targetObj, Field field, Method setMethod, Method getMethod) {
+    public static Object initField(Object targetObj, Field field, Method setMethod, Method getMethod, int i) {
         try {
             Object targetFiledObj = null;
             boolean newFlag = false;
             if (getMethod != null) {
                 targetFiledObj = getMethod.invoke(targetObj);
             } else {
-                field.setAccessible(true);
                 targetFiledObj = field.get(targetObj);
             }
             if (targetFiledObj == null) {
@@ -186,7 +187,7 @@ public class XlsAnnotationUtils {
         try {
             if (innerSetMethod != null || innerSheetField != null) {
                 Object realObj = targetObj;
-                if (index != null) {
+                if (index != null && targetObj instanceof Collection<?>) {
                     while (((Collection<?>) targetObj).size() <= index) {
                         Type genericType = field.getGenericType();
                         ParameterizedType pt = (ParameterizedType) genericType;
@@ -203,13 +204,13 @@ public class XlsAnnotationUtils {
                     }
                     if (innerSetMethod != null) {
                         innerSetMethod.invoke(realObj, fieldValue);
-                    } else {
+                    } else if (innerSheetField != null) {
                         innerSheetField.set(realObj, fieldValue);
                     }
                 } else {
                     if (innerSetMethod != null) {
                         innerSetMethod.invoke(realObj, fieldValue);
-                    } else {
+                    } else if (innerSheetField != null) {
                         innerSheetField.set(realObj, fieldValue);
                     }
                 }
@@ -232,13 +233,13 @@ public class XlsAnnotationUtils {
                     }
                     if (setMethod != null) {
                         setMethod.invoke(realObj, fieldValue);
-                    } else {
+                    } else if (field != null) {
                         field.set(realObj, fieldValue);
                     }
                 } else {
                     if (setMethod != null) {
                         setMethod.invoke(realObj, fieldValue);
-                    } else {
+                    } else if (field != null) {
                         field.set(realObj, fieldValue);
                     }
                 }
@@ -310,5 +311,29 @@ public class XlsAnnotationUtils {
 
     public static boolean isNotEmptyStr(String toFieldName) {
         return toFieldName!=null && !"".equals(toFieldName.trim());
+    }
+
+    public static Object getFieldValue(Object targetObj, Field field, Method getMethod,Field innerField ,Method innerGetMethod, Integer innerIndex) {
+        try{
+            Object result = null;
+            if(getMethod!=null){
+                result = getMethod.invoke(targetObj);
+            }else if(field!=null){
+                result = field.get(targetObj);
+            }
+            if(innerIndex!=null && innerIndex >=0 && result instanceof List<?>){
+                result = ((List<?>) result).get(innerIndex);
+            }
+
+            if(innerGetMethod!=null){
+                result = innerGetMethod.invoke(result);
+            }else if(innerField!=null){
+                result = innerGetMethod.invoke(result);
+            }
+            return result;
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
     }
 }
