@@ -1,44 +1,32 @@
 package org.example.test.vo;
 
 import org.example.vo.XlsExcel;
-import org.example.vo.XlsIgnore;
 import org.example.vo.XlsIndex;
 
 import java.util.List;
-import java.util.Map;
 
 @XlsExcel(title = "导入模板", category = {"type|key|name", "type1|key1|name1", "type2|key2|name2"})
-public class MainVo extends BaseVo {
-
-    @XlsIgnore
-    Sheet1 sheet1;
+public class MainVo  {
+    @XlsIndex(index = 1)
+    private List<Student> studentList;
 
     @XlsIndex(index = 0)
-    List<Sheet2> sheet2List;
+    private List<Teacher> teachers;
 
-    Map<?, ?> map;
-
-    public Sheet1 getSheet1() {
-        return sheet1;
+    public List<Teacher> getTeachers() {
+        return teachers;
     }
 
-    public void setSheet1(Sheet1 sheet1) {
-        this.sheet1 = sheet1;
+    public void setTeachers(List<Teacher> teachers) {
+        this.teachers = teachers;
     }
 
-    public List<Sheet2> getSheet2List() {
-        return sheet2List;
+    public List<Student> getSheet2List() {
+        return studentList;
     }
 
-    public void setSheet2List(List<Sheet2> sheet2List) {
-        this.sheet2List = sheet2List;
+    public void setSheet2List(List<Student> studentList) {
+        this.studentList = studentList;
     }
 
-    public Map<?, ?> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<?, ?> map) {
-        this.map = map;
-    }
 }

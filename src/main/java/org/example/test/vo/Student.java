@@ -1,36 +1,36 @@
 package org.example.test.vo;
 
-import org.example.business.BusinessSheet1;
+import org.example.business.CourseBusiness;
+import org.example.business.StudentBusiness;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@XlsSheet(index = 1, hidden = false, title = "Sheet 样例1", toClass = BusinessSheet1.class)
-public class Sheet1  {
+@XlsSheet(index = 1, hidden = false, title = "学生", toClass = StudentBusiness.class)
+public class Student {
 
-    @XlsCell(index = 1, headTitle = {"组1", "子组2", "三级组1"}, headStyle = "headStyle")
+    @XlsCell(headTitle = {"用户", "ID"},index = 1,validation = "Integer")
     private Integer id;
 
-    @XlsCell(index = 2, headTitle = {"组1", "子组2", "三级组2"}, headStyle = "headStyle")
+    @XlsCell(headTitle = {"用户", "名称"},index = 2)
     private String name;
 
-    @XlsCell(index = 6, headTitle = {"组1", "子组2", "三级组2"}, headStyle = "headStyle")
+    @XlsCell(headTitle = {"金额"},index = 3)
     private BigDecimal price;
 
-    @XlsCell(index = 3, headStyle = "headStyle")
+    @XlsCell(headTitle = {"主表ID"}, index = 4)
+    private Integer parentId;
+
+    @XlsCell(index = 5)
     private String email;
 
-    @XlsCell(index = 4, headStyle = "headStyle", validation = "dateStyle")
+    @XlsCell(index = 6, validation = "dateStyle")
     private Date birthDate;
 
-    @XlsCell(index = 5, headStyle = "headStyle")
+    @XlsCell(index = 7)
     private String idCard;
-
-    @XlsCell(index = 7, headTitle = {"隐藏列"}, headStyle = "headStyle")
-    private String hiddenField;
-
 
     public Integer getId() {
         return id;
@@ -80,11 +80,11 @@ public class Sheet1  {
         this.idCard = idCard;
     }
 
-    public String getHiddenField() {
-        return hiddenField;
+    public Integer getParentId() {
+        return parentId;
     }
 
-    public void setHiddenField(String hiddenField) {
-        this.hiddenField = hiddenField;
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 }

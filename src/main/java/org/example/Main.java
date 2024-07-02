@@ -2,14 +2,13 @@ package org.example;
 
 //import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.IOUtils;
-import org.example.business.BusinessSheet2;
 import org.example.test.vo.MainVo;
 import org.example.utils.XlsGlobalUtils;
 import org.example.xls.config.XlsCellConfig;
 import org.example.xls.config.XlsSheetConfig;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import javax.print.DocFlavor;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -44,18 +43,30 @@ public class Main {
 
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         List<XlsCellConfig> xlsCellConfigs = XlsGlobalUtils.allExcelConfigs.values().iterator().next().sheetConfigs().get(0).xlsCellConfigs();
-        XlsGlobalUtils.getXlsTemplate(MainVo.class);
 
-        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
-        Object o = XlsGlobalUtils.loadData(byteArray);
-        System.out.println(o);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XlsGlobalUtils.getXlsTemplate(MainVo.class,outputStream);
+
+        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate.xlsx")){
+            fileOutputStream.write(outputStream.toByteArray());
+        }
 //
-        List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
+//        Object o = XlsGlobalUtils.loadData(byteArray);
+//        System.out.println(o);
+////
+//        List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+////
+//        System.out.println(businessObj);
 //
-        System.out.println(businessObj);
+//        XlsGlobalUtils.buildStruct(businessObj);
+//
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        XlsGlobalUtils.export(Map.of(),MainVo.class,byteArrayOutputStream);
+//
+//        FileOutputStream fileOutputStream = new FileOutputStream("./target/export.xlsx");
+//        fileOutputStream.write(byteArrayOutputStream.toByteArray());
+//        fileOutputStream.close();
 
-        XlsGlobalUtils.buildStruct(businessObj);
-
-        XlsGlobalUtils.export(Map.of(),MainVo.class);
     }
 }

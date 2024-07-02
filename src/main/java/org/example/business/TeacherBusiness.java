@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class BusinessSheet1 {
+public class TeacherBusiness {
     private Integer id;
 
     private String name;
@@ -17,7 +17,15 @@ public class BusinessSheet1 {
 
     private String businessIdCard;
 
-    private List<BusinessSheet2> businessSheet2List;
+    private List<CourseBusiness> courseBusiness;
+
+    public List<CourseBusiness> getBusinessInnerSheet() {
+        return courseBusiness;
+    }
+
+    public void setBusinessInnerSheet(List<CourseBusiness> courseBusiness) {
+        this.courseBusiness = courseBusiness;
+    }
 
     public Integer getId() {
         return id;
@@ -67,11 +75,4 @@ public class BusinessSheet1 {
         this.businessIdCard = businessIdCard;
     }
 
-    public List<BusinessSheet2> getBusinessSheet2List() {
-        return businessSheet2List;
-    }
-
-    public void setBusinessSheet2List(List<BusinessSheet2> businessSheet2List) {
-        this.businessSheet2List = businessSheet2List;
-    }
 }

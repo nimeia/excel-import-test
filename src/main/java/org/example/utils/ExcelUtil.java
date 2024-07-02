@@ -52,4 +52,21 @@ public class ExcelUtil {
                 return null;
         }
     }
+
+
+    /**
+     * 将Excel列序号转换为列标签
+     * @param columnNumber Excel列序号（例如，1、2、27、703）
+     * @return 对应的列标签（例如，A、B、AA、AAA）
+     */
+    public static String getColumnLabel(int columnNumber) {
+        StringBuilder sb = new StringBuilder();
+        while (columnNumber > 0) {
+            int remainder = (columnNumber - 1) % 26;  // 计算余数，A对应0，Z对应25
+            char ch = (char) ('A' + remainder);       // 转换为字母
+            sb.insert(0, ch);                         // 插入到字符串的开头
+            columnNumber = (columnNumber - 1) / 26;   // 减1除以26，获取下一个字母的值
+        }
+        return sb.toString();
+    }
 }

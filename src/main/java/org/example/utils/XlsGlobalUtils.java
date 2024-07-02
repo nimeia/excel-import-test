@@ -7,9 +7,8 @@ import org.example.test.vo.MainVo;
 import org.example.vo.*;
 import org.example.xls.config.*;
 import org.reflections.ReflectionUtils;
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+
+import java.io.*;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -203,8 +202,8 @@ public class XlsGlobalUtils {
      * @param clazz
      * @return
      */
-    public static byte[] getXlsTemplate(Class<?> clazz) {
-        return allTemplateCaches.computeIfAbsent(clazz, k -> {
+    public static void getXlsTemplate(Class<?> clazz, OutputStream outputStream) {
+        byte[] xes = allTemplateCaches.computeIfAbsent(clazz, k -> {
 
             Workbook workbook = new XSSFWorkbook();
 
@@ -250,19 +249,19 @@ public class XlsGlobalUtils {
 
                             // 创建批注对象
 //                          if(j == xlsSheet.headRow()-1){
-                                Comment comment = drawing.createCellComment(anchor);
-                                RichTextString str = null;
-                                if(xlsCell.innerSheetField()!=null){
-                                    str = factory.createRichTextString(xlsCell.innerSheetField().getName());
-                                }else{
-                                    str = factory.createRichTextString(xlsCell.field().getName());
-                                }
+                            Comment comment = drawing.createCellComment(anchor);
+                            RichTextString str = null;
+                            if (xlsCell.innerSheetField() != null) {
+                                str = factory.createRichTextString(xlsCell.innerSheetField().getName());
+                            } else {
+                                str = factory.createRichTextString(xlsCell.field().getName());
+                            }
 
-                                comment.setString(str);
-                                comment.setAuthor("X");
-                                comment.setVisible(false);
-                                // 设置批注到单元格
-                                cell.setCellComment(comment);
+                            comment.setString(str);
+                            comment.setAuthor("X");
+                            comment.setVisible(false);
+                            // 设置批注到单元格
+                            cell.setCellComment(comment);
 //                           }
 
                         }
@@ -270,7 +269,7 @@ public class XlsGlobalUtils {
                             // 创建单元格样式
                             try {
                                 HeadStyle headStyle = headStyleMap.get(xlsCell.headStyle());
-                                if(headStyle != null){
+                                if (headStyle != null) {
                                     CellStyle cellStyle = headStyle.headStyle(dataSheet);
                                     // 应用样式到单元格
                                     cell.setCellStyle(cellStyle);
@@ -279,14 +278,14 @@ public class XlsGlobalUtils {
                                 throw new RuntimeException(e);
                             }
                         }
-                        if(j == xlsSheet.headRow()-1){
+                        if (j == xlsSheet.headRow() - 1) {
                             //设置列格式
                             if (!xlsCell.validation().equals("")) {
                                 // 创建单元格样式
                                 try {
                                     ColumnValidation columnValidation = validationMap.get(xlsCell.validation());
-                                    if(columnValidation!=null){
-                                        columnValidation.validation(workbook,dataSheet,xlsSheet.headRow(),1048576,cell.getColumnIndex(),cell.getColumnIndex());
+                                    if (columnValidation != null) {
+                                        columnValidation.validation(workbook, dataSheet, xlsSheet.headRow(), 1000000, cell.getColumnIndex(), cell.getColumnIndex());
                                     }
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
@@ -308,18 +307,25 @@ public class XlsGlobalUtils {
                 hiddenSheet.autoSizeColumn(0);
             }
 
-            // 将工作簿写入文件
-            try (FileOutputStream fileOut = new FileOutputStream("./test.xlsx")) {
-                workbook.write(fileOut);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            try {
+                workbook.write(byteArrayOutputStream);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
-
-
-//            workbook.close();
-
-            return null;
+            return byteArrayOutputStream.toByteArray();
         });
+        try {
+            outputStream.write(xes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -907,7 +913,7 @@ public class XlsGlobalUtils {
      * @param data
      * @param mainVoClass
      */
-    public static void export(Object data, Class<MainVo> mainVoClass) {
+    public static void export(Object data, Class<MainVo> mainVoClass, OutputStream outputStream) {
         XlsExcelConfig xlsExcelConfig = allExcelConfigs.get(mainVoClass);
         if (xlsExcelConfig == null) {
             throw new RuntimeException("未找到对应的配置数据");
@@ -948,10 +954,17 @@ public class XlsGlobalUtils {
             }
         });
 
-        byte[] xlsTemplate = getXlsTemplate(mainVoClass);
-        Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(xlsTemplate));
+        ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
+        getXlsTemplate(mainVoClass, outputStream1);
+        Workbook workbook = null;
+        try {
+            workbook = new XSSFWorkbook(new ByteArrayInputStream(outputStream1.toByteArray()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Workbook finalWorkbook = workbook;
         splitedData.forEach((xlsSheetConfig, sheetData) -> {
-            Sheet sheet = workbook.getSheet(xlsSheetConfig.title());
+            Sheet sheet = finalWorkbook.getSheet(xlsSheetConfig.title());
             //行数据
             int startRow = xlsSheetConfig.headRow() - 1;
             for (Object rowData : sheetData) {
@@ -959,55 +972,64 @@ public class XlsGlobalUtils {
                 int startCol = 0;
                 //列数据
                 for (XlsCellConfig xlsCellConfig : xlsSheetConfig.xlsCellConfigs()) {
-                    startCol ++;
-                    Object cellValue = null;
-                    if(xlsCellConfig.targetGetMethod()!=null){
-                        cellValue = xlsCellConfig.targetGetMethod().invoke(rowData);
-                    }else if(xlsCellConfig.targetField()!=null){
-                        cellValue = xlsCellConfig.targetField().get(rowData);
-                    }
+                    try{
+                        startCol ++;
+                        Object cellValue = null;
+                        if(xlsCellConfig.targetGetMethod()!=null){
+                            cellValue = xlsCellConfig.targetGetMethod().invoke(rowData);
+                        }else if(xlsCellConfig.targetField()!=null){
+                            cellValue = xlsCellConfig.targetField().get(rowData);
+                        }
 
-                    if(xlsCellConfig.isArray()){
-                        if(((List<?>) cellValue).size()>xlsCellConfig.innerSheetIndex()){
-                            cellValue = ((List<?>) cellValue).get(xlsCellConfig.innerSheetIndex());
-                        }else{
-                            cellValue = null;
+                        if(xlsCellConfig.isArray()){
+                            if(((List<?>) cellValue).size()>xlsCellConfig.innerSheetIndex()){
+                                cellValue = ((List<?>) cellValue).get(xlsCellConfig.innerSheetIndex());
+                            }else{
+                                cellValue = null;
+                            }
                         }
-                    }
 
-                    if(cellValue!=null &&xlsCellConfig.innerSheetTargetGetMethod()!=null){
-                        cellValue = xlsCellConfig.innerSheetTargetGetMethod().invoke(cellValue);
-                    }else if(cellValue!=null &&xlsCellConfig.innerSheetTargetField()!=null){
-                        cellValue = xlsCellConfig.innerSheetTargetField().get(cellValue);
-                    }
+                        if(cellValue!=null &&xlsCellConfig.innerSheetTargetGetMethod()!=null){
+                            cellValue = xlsCellConfig.innerSheetTargetGetMethod().invoke(cellValue);
+                        }else if(cellValue!=null &&xlsCellConfig.innerSheetTargetField()!=null){
+                            cellValue = xlsCellConfig.innerSheetTargetField().get(cellValue);
+                        }
 
-                    if(cellValue!=null){
-                        Row row = sheet.getRow(startRow);
-                        if(row==null){
-                            row = sheet.createRow(startRow);
+                        if(cellValue!=null){
+                            Row row = sheet.getRow(startRow);
+                            if(row==null){
+                                row = sheet.createRow(startRow);
+                            }
+                            Cell cell = row.getCell(startCol);
+                            if(cell==null){
+                                cell = row.createCell(startCol);
+                            }
+                            if(cellValue instanceof Boolean){
+                                cell.setCellValue((Boolean) cellValue);
+                            }else if (cellValue instanceof Double){
+                                cell.setCellValue((Double) cellValue);
+                            }else if (cellValue instanceof Integer){
+                                cell.setCellValue((Integer) cellValue);
+                            }else if (cellValue instanceof Long){
+                                cell.setCellValue((Long) cellValue);
+                            }else if (cellValue instanceof String){
+                                cell.setCellValue((String) cellValue);
+                            }else if (cellValue instanceof Date){
+                                cell.setCellValue((Date) cellValue);
+                            }else {
+                                cell.setCellValue(cellValue.toString());
+                            }
                         }
-                        Cell cell = row.getCell(startCol);
-                        if(cell==null){
-                            cell = row.createCell(startCol);
-                        }
-                        if(cellValue instanceof Boolean){
-                            cell.setCellValue((Boolean) cellValue);
-                        }else if (cellValue instanceof Double){
-                            cell.setCellValue((Double) cellValue);
-                        }else if (cellValue instanceof Integer){
-                            cell.setCellValue((Integer) cellValue);
-                        }else if (cellValue instanceof Long){
-                            cell.setCellValue((Long) cellValue);
-                        }else if (cellValue instanceof String){
-                            cell.setCellValue((String) cellValue);
-                        }else if (cellValue instanceof Date){
-                            cell.setCellValue((Date) cellValue);
-                        }else {
-                            cell.setCellValue(cellValue.toString());
-                        }
+                    }catch (Exception e){
+                        throw new RuntimeException(e);
                     }
                 }
             }
         });
+        try {
+            workbook.write(outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

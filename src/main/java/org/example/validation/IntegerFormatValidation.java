@@ -20,11 +20,11 @@ public class IntegerFormatValidation implements ColumnValidation {
 
         // Create the Data Validation
         DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-        DataValidationConstraint integerConstraint = validationHelper.createIntegerConstraint(DataValidationConstraint.OperatorType.BETWEEN, "1", "1000");
+        DataValidationConstraint integerConstraint = validationHelper.createIntegerConstraint(DataValidationConstraint.OperatorType.BETWEEN, String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE));
         DataValidation dataValidation = validationHelper.createValidation(integerConstraint, addressList);
         dataValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
         dataValidation.setShowErrorBox(true);
-        dataValidation.createErrorBox("Invalid Input", "Please enter an integer between 1 and 1000.");
+        dataValidation.createErrorBox("Invalid Input", "Please enter an integer between "+Integer.MIN_VALUE+" and "+Integer.MAX_VALUE);
 
         // Add the data validation to the sheet
         sheet.addValidationData(dataValidation);

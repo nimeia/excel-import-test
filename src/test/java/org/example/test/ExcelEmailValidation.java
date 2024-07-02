@@ -1,43 +1,48 @@
 package org.example.test;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLOutput;
 
 public class ExcelEmailValidation {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sheet1");
 
-        // Create a cell range for the data validation (entire column A)
-        CellRangeAddressList addressList = new CellRangeAddressList(1, 10, 0, 0);
-
-        // Create the Data Validation
+        // 数据验证助手
         DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-        DataValidationConstraint emailConstraint = validationHelper.createCustomConstraint("ISNUMBER(SEARCH(\"@\", A1:A100))");
-        DataValidation dataValidation = validationHelper.createValidation(emailConstraint, addressList);
-        dataValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-        dataValidation.setShowErrorBox(true);
-        dataValidation.createErrorBox("Invalid Email", "Please enter a valid email address.");
 
-        // Add the data validation to the sheet
+        // 创建自定义公式进行电子邮件验证
+        String emailRegex = "^[\\w\\-]+(\\.[\\w\\-]+)*@[\\w\\-]+(\\.[\\w\\-]+)*(\\.[a-zA-Z]{2,})$";
+        String customFormula = "AND(ISNUMBER(FIND(\"@\",ADDRESS(ROW();COLUMN();2)),ISNUMBER(FIND(\".\",ADDRESS(ROW();COLUMN();2))),NOT(ISNUMBER(FIND(\" \",ADDRESS(ROW();COLUMN();2))))";
+        System.out.println(customFormula);
+        // 定义应用数据验证的单元格范围
+        CellRangeAddressList addressList = new CellRangeAddressList(2, 100, 0, 0);
+
+        // 创建数据验证约束
+        DataValidationConstraint constraint = validationHelper.createCustomConstraint(customFormula);
+
+        // 创建数据验证对象
+        DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
+
+        // 启用输入框的错误提示
+        dataValidation.setShowErrorBox(true);
+        dataValidation.createErrorBox("Invalid Input", "Please input email.");
+
+
+        // 添加数据验证到工作表
         sheet.addValidationData(dataValidation);
 
-        // Create headers
-        Row headerRow = sheet.createRow(0);
-        Cell headerCell = headerRow.createCell(0);
-        headerCell.setCellValue("Email Address");
-
-        // Write the output to a file
-        try (FileOutputStream fileOut = new FileOutputStream("./target/workbook_with_email_validation.xlsx")) {
+        // 保存工作簿
+        try (FileOutputStream fileOut = new FileOutputStream("./target/ExcelWithEmailValidation.xlsx")) {
             workbook.write(fileOut);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Close the workbook
-        workbook.close();
     }
 }
 

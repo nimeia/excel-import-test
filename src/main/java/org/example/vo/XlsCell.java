@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Inherited
 public @interface XlsCell {
 
-    String headStyle() default "";
+    String headStyle() default "headStyle";
 
     String validation() default "";
 

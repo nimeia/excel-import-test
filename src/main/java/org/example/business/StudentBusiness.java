@@ -1,10 +1,8 @@
 package org.example.business;
 
-import org.example.vo.XlsCell;
-
 import java.math.BigDecimal;
 
-public class BusinessSheet2 {
+public class StudentBusiness {
 
 
     private Integer id;
@@ -14,8 +12,6 @@ public class BusinessSheet2 {
     private BigDecimal price;
 
     private String email;
-
-    private BusinessInnerSheet businessInnerSheet;
 
     public Integer getId() {
         return id;
@@ -33,11 +29,4 @@ public class BusinessSheet2 {
         this.name = name;
     }
 
-    public BusinessInnerSheet getBusinessInnerSheet() {
-        return businessInnerSheet;
-    }
-
-    public void setBusinessInnerSheet(BusinessInnerSheet businessInnerSheet) {
-        this.businessInnerSheet = businessInnerSheet;
-    }
 }

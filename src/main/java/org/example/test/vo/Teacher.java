@@ -1,25 +1,27 @@
 package org.example.test.vo;
 
-import org.example.business.BusinessSheet1;
+import org.example.business.CourseBusiness;
+import org.example.business.TeacherBusiness;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
-@XlsSheet(index = 1, hidden = false, title = "Sheet 样例2", toClass = BusinessSheet1.class)
-public class SheetBase {
+@XlsSheet(index = 1, hidden = false, title = "老师", toClass = TeacherBusiness.class)
+public class Teacher {
 
-    @XlsCell(index = 0, headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 1, headTitle = {"老师信息", "ID"}, headStyle = "redHead")
     private Integer id;
 
-    @XlsCell(index = 1, headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 2, headTitle = {"老师信息", "名称"})
     private String name;
 
-    @XlsCell(index = 2, headTitle = {"组1", "子组2", "三级组2"})
+    @XlsCell(index = 6, headTitle = {"price"})
     private BigDecimal price;
 
-    @XlsCell(index = 3)
+    @XlsCell(index = 3,validation = "email")
     private String email;
 
     @XlsCell(index = 4)
@@ -28,8 +30,16 @@ public class SheetBase {
     @XlsCell(index = 5)
     private String idCard;
 
-    @XlsCell(index = 6, headTitle = {"隐藏列"})
-    private String hiddenField;
+    @XlsCell(index = 7,innerSheetRowCount = 3,innerSheetToClass = CourseBusiness.class,toField = "courseBusiness")
+    private List<Course> courses;
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
 
     public Integer getId() {
         return id;
@@ -79,11 +89,4 @@ public class SheetBase {
         this.idCard = idCard;
     }
 
-    public String getHiddenField() {
-        return hiddenField;
-    }
-
-    public void setHiddenField(String hiddenField) {
-        this.hiddenField = hiddenField;
-    }
 }

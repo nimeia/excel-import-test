@@ -1,10 +1,8 @@
 package org.example.business;
 
-import org.example.vo.XlsCell;
-
 import java.math.BigDecimal;
 
-public class BusinessInnerSheet {
+public class CourseBusiness {
 
     private Integer innerId;
 
