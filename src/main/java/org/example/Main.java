@@ -2,13 +2,16 @@ package org.example;
 
 //import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.IOUtils;
+import org.example.business.BusinessSheet2;
 import org.example.test.vo.MainVo;
 import org.example.utils.XlsGlobalUtils;
 import org.example.xls.config.XlsCellConfig;
+import org.example.xls.config.XlsSheetConfig;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -47,12 +50,12 @@ public class Main {
         Object o = XlsGlobalUtils.loadData(byteArray);
         System.out.println(o);
 //
-        Object businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+        List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
 //
         System.out.println(businessObj);
 
-//        XlsGlobalUtils.buildStruct(businessObj,);
+        XlsGlobalUtils.buildStruct(businessObj);
 
-
+        XlsGlobalUtils.export(Map.of(),MainVo.class);
     }
 }

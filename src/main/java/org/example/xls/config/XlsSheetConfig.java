@@ -67,6 +67,32 @@ public class XlsSheetConfig {
      */
     private boolean hidden;
 
+    /**
+     * 指向父对象
+     * @return
+     */
+    private Class<?> parentClass;
+
+    private Field parentContainerField;
+    private Method parentContainerSetMethod;
+    private Method parentContainerGetMethod;
+
+    /**
+     * 父级关联ID
+     * @return
+     */
+    private Field parentLinkId;
+    private Method parentLinkSetMethod;
+    private Method parentLinkGetMethod;
+
+    /**
+     * 关联ID
+     * @return
+     */
+    private Field linkId;
+    private Method linkSetMethod;
+    private Method linkGetMethod;
+
     private List<XlsCellConfig> xlsCellConfigs = new ArrayList<XlsCellConfig>();
 
     public XlsSheetConfig(XlsSheet xlsSheet) {
@@ -78,6 +104,7 @@ public class XlsSheetConfig {
         this.index = xlsSheet.index();
         this.hidden = xlsSheet.hidden();
         this.toClass = xlsSheet.toClass();
+        this.parentClass = xlsSheet.parentClass();
     }
 
     @Override
@@ -208,6 +235,96 @@ public class XlsSheetConfig {
 
     public XlsSheetConfig xlsCellConfigs(List<XlsCellConfig> xlsCellConfigs) {
         this.xlsCellConfigs = xlsCellConfigs;
+        return this;
+    }
+
+    public Class<?> parentClass() {
+        return parentClass;
+    }
+
+    public XlsSheetConfig parentClass(Class<?> parentClass) {
+        this.parentClass = parentClass;
+        return this;
+    }
+
+    public Field parentContainerField() {
+        return parentContainerField;
+    }
+
+    public XlsSheetConfig parentContainerField(Field parentContainerField) {
+        this.parentContainerField = parentContainerField;
+        return this;
+    }
+
+    public Method parentContainerSetMethod() {
+        return parentContainerSetMethod;
+    }
+
+    public XlsSheetConfig parentContainerSetMethod(Method parentContainerSetMethod) {
+        this.parentContainerSetMethod = parentContainerSetMethod;
+        return this;
+    }
+
+    public Method parentContainerGetMethod() {
+        return parentContainerGetMethod;
+    }
+
+    public XlsSheetConfig parentContainerGetMethod(Method parentContainerGetMethod) {
+        this.parentContainerGetMethod = parentContainerGetMethod;
+        return this;
+    }
+
+    public Field parentLinkId() {
+        return parentLinkId;
+    }
+
+    public XlsSheetConfig parentLinkId(Field parentLinkId) {
+        this.parentLinkId = parentLinkId;
+        return this;
+    }
+
+    public Method parentLinkSetMethod() {
+        return parentLinkSetMethod;
+    }
+
+    public XlsSheetConfig parentLinkSetMethod(Method parentLinkSetMethod) {
+        this.parentLinkSetMethod = parentLinkSetMethod;
+        return this;
+    }
+
+    public Method parentLinkGetMethod() {
+        return parentLinkGetMethod;
+    }
+
+    public XlsSheetConfig parentLinkGetMethod(Method parentLinkGetMethod) {
+        this.parentLinkGetMethod = parentLinkGetMethod;
+        return this;
+    }
+
+    public Field linkId() {
+        return linkId;
+    }
+
+    public XlsSheetConfig linkId(Field linkId) {
+        this.linkId = linkId;
+        return this;
+    }
+
+    public Method linkSetMethod() {
+        return linkSetMethod;
+    }
+
+    public XlsSheetConfig linkSetMethod(Method linkSetMethod) {
+        this.linkSetMethod = linkSetMethod;
+        return this;
+    }
+
+    public Method linkGetMethod() {
+        return linkGetMethod;
+    }
+
+    public XlsSheetConfig linkGetMethod(Method linkGetMethod) {
+        this.linkGetMethod = linkGetMethod;
         return this;
     }
 }

@@ -3,6 +3,7 @@ package org.example.utils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.test.vo.MainVo;
 import org.example.vo.*;
 import org.example.xls.config.*;
 import org.reflections.ReflectionUtils;
@@ -10,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class XlsGlobalUtils {
@@ -156,6 +158,25 @@ public class XlsGlobalUtils {
                     //初始化cell 配置
                     Class<?> realClass = XlsAnnotationUtils.fieldCollectionRealType(sheetField);
                     if(realClass == null) realClass = sheetField.getType();
+
+                    //设置关联信息
+                    if (xlsSheet.parentClass() != null) {
+                        if (!"".equals(xlsSheet.linkId())) {
+                            xlsSheetConfig.linkId(XlsAnnotationUtils.getFieldByName(xlsSheetConfig.toClass(),xlsSheet.linkId()));
+                            xlsSheetConfig.linkSetMethod(XlsAnnotationUtils.getSetterMethod(xlsSheetConfig.toClass(),xlsSheet.linkId()));
+                            xlsSheetConfig.linkGetMethod(XlsAnnotationUtils.getGetterMethod(xlsSheetConfig.toClass(),xlsSheet.linkId()));
+                        }
+                        if (!"".equals(xlsSheet.parentContainerField())) {
+                            xlsSheetConfig.parentContainerField(XlsAnnotationUtils.getFieldByName(xlsSheetConfig.parentClass(),xlsSheet.parentContainerField()));
+                            xlsSheetConfig.parentContainerSetMethod(XlsAnnotationUtils.getSetterMethod(xlsSheetConfig.parentClass(),xlsSheet.parentContainerField()));
+                            xlsSheetConfig.parentContainerGetMethod(XlsAnnotationUtils.getGetterMethod(xlsSheetConfig.parentClass(),xlsSheet.parentContainerField()));
+                        }
+                        if (!"".equals(xlsSheet.parentLinkId())) {
+                            xlsSheetConfig.parentLinkId(XlsAnnotationUtils.getFieldByName(xlsSheetConfig.parentClass(),xlsSheet.parentLinkId()));
+                            xlsSheetConfig.parentLinkSetMethod(XlsAnnotationUtils.getSetterMethod(xlsSheetConfig.parentClass(),xlsSheet.parentLinkId()));
+                            xlsSheetConfig.parentLinkGetMethod(XlsAnnotationUtils.getGetterMethod(xlsSheetConfig.parentClass(),xlsSheet.parentLinkId()));
+                        }
+                    }
                     initSheetCells(realClass, xlsSheetConfig);
                 }
             }
@@ -460,7 +481,7 @@ public class XlsGlobalUtils {
      *
      * @param o
      */
-    public static Object transform(Object o, Class<?> clazz) {
+    public static List<Map<XlsSheetConfig, Object>> transform(Object o, Class<?> clazz) {
         if (!clazz.isAnnotationPresent(XlsExcel.class)) {
             return null;
         }
@@ -469,7 +490,7 @@ public class XlsGlobalUtils {
         List<Map<XlsSheetConfig, Object>> result = new ArrayList<>();
         if (Collection.class.isAssignableFrom(o.getClass())) {
             //这种场景只能是单表，
-            return doTransform(xlsExcel.sheetConfigs().get(0), o);
+            result.add( doTransform(xlsExcel.sheetConfigs().get(0), o));
         } else {
 //            Set<Field> allFields = ReflectionUtils.getAllFields(clazz,
 //                    (f) -> f.getType().isAnnotationPresent(XlsSheet.class) && !f.getType().isAnnotationPresent(XlsIgnore.class));
@@ -792,4 +813,201 @@ public class XlsGlobalUtils {
     }
 
 
+    /**
+     * 生成类间的关联信息
+     * @param businessObj
+     */
+    public static void buildStruct(List<Map<XlsSheetConfig, Object>> businessObj) {
+        for (int i = 0; i < businessObj.size(); i++) {
+            Map<XlsSheetConfig, Object> xlsSheetConfigObjectMap = businessObj.get(i);
+            xlsSheetConfigObjectMap.forEach((xlsSheetConfig, loopData) -> {
+                if (xlsSheetConfig.parentClass() != null && xlsSheetConfig.parentClass() != void.class) {
+                    //找到 parent 对象
+                    List<Map<XlsSheetConfig, Object>> parentDataList = businessObj.stream().filter(b -> {
+                        return b.keySet().stream().anyMatch(xlsSheetConfig1 -> {
+                            return xlsSheetConfig1.toClass() == xlsSheetConfig.parentClass();
+                        });
+                    }).toList();
+                    if (parentDataList.isEmpty()) {
+                        return;
+                    }
+                    if (parentDataList.size() > 1) {
+                        throw new RuntimeException("parent times not right :" + xlsSheetConfig.parentClass());
+                    }
+
+                    if(loopData instanceof List<?>){
+                        ((List<?>) loopData).forEach(data ->{
+                            doLink(xlsSheetConfig,data,parentDataList);
+                        });
+                    }else{
+                        doLink(xlsSheetConfig,loopData,parentDataList);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 对象间关联绑定
+     * @param xlsSheetConfig
+     * @param data
+     * @param parentDataList
+     */
+    private static void doLink(XlsSheetConfig xlsSheetConfig, Object data, List<Map<XlsSheetConfig, Object>> parentDataList) {
+        if(data ==null) return;
+        parentDataList.stream().filter( p -> {
+            try{
+                Object foreignKey = null;
+                Object parentKey = null;
+                if(xlsSheetConfig.linkGetMethod()!=null){
+                    foreignKey = xlsSheetConfig.linkGetMethod().invoke(data);
+                }else if(xlsSheetConfig.linkId()!=null){
+                    foreignKey = xlsSheetConfig.linkId().get(data);
+                }
+
+                if(xlsSheetConfig.parentLinkGetMethod()!=null){
+                    parentKey = xlsSheetConfig.parentLinkGetMethod().invoke(p);
+                }else if(xlsSheetConfig.parentLinkId()!=null){
+                    parentKey = xlsSheetConfig.parentLinkId().get(p);
+                }
+                if(foreignKey==null && parentKey==null){
+                    return GenericComparator.compare(foreignKey,parentKey) == 0;
+                }
+                return false;
+            }catch (Exception e){
+                throw new RuntimeException(e);
+            }
+
+        }).forEach( p ->{
+            try{
+                if(Collection.class.isAssignableFrom(xlsSheetConfig.parentContainerField().getType())){
+                    Object list = xlsSheetConfig.parentContainerField().get(p);
+                    if(list ==null){
+                        list = xlsSheetConfig.parentContainerField().getType().getDeclaredConstructor().newInstance();
+                        xlsSheetConfig.parentContainerField().set(p,list);
+                    }
+                    ((Collection)list).add(data);
+                }else{
+                    if(xlsSheetConfig.parentContainerSetMethod()!=null){
+                        xlsSheetConfig.parentContainerSetMethod().invoke(p,data);
+                    }else if(xlsSheetConfig.parentContainerField()!=null){
+                        xlsSheetConfig.parentContainerField().set(p,data);
+                    }
+                }
+            }catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        });
+
+
+    }
+
+    /**
+     * 导出excel 数据
+     * @param data
+     * @param mainVoClass
+     */
+    public static void export(Object data, Class<MainVo> mainVoClass) {
+        XlsExcelConfig xlsExcelConfig = allExcelConfigs.get(mainVoClass);
+        if (xlsExcelConfig == null) {
+            throw new RuntimeException("未找到对应的配置数据");
+        }
+        Map<XlsSheetConfig, List> splitedData = new HashMap();
+        List loopData = new ArrayList();
+        if (data instanceof Map) {
+            loopData.addAll(((Map) data).values());
+        } else if (data instanceof Collection<?>) {
+            loopData.addAll((Collection) data);
+        } else {
+            Set<Field> allFields = ReflectionUtils.getAllFields(data.getClass());
+            for (Field field : allFields) {
+                field.setAccessible(true);
+                Object o = null;
+                try {
+                    o = field.get(data);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                if (o != null) {
+                    loopData.add(o);
+                }
+            }
+        }
+
+        loopData.forEach(v -> {
+            Class z = v.getClass();
+            if (Collection.class.isAssignableFrom(v.getClass())) {
+                Type genericType = v.getClass().getComponentType();
+                ParameterizedType pt = (ParameterizedType) genericType;
+                z = (Class<?>) pt.getActualTypeArguments()[0];
+            }
+            Class finalZ = z;
+            XlsSheetConfig xlsSheetConfig = xlsExcelConfig.sheetConfigs().stream().filter(sheet -> sheet.toClass() == finalZ).findFirst().orElse(null);
+            if (xlsSheetConfig != null) {
+                splitedData.put(xlsSheetConfig, (v instanceof List<?>) ? (List) v : List.of(v));
+            }
+        });
+
+        byte[] xlsTemplate = getXlsTemplate(mainVoClass);
+        Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(xlsTemplate));
+        splitedData.forEach((xlsSheetConfig, sheetData) -> {
+            Sheet sheet = workbook.getSheet(xlsSheetConfig.title());
+            //行数据
+            int startRow = xlsSheetConfig.headRow() - 1;
+            for (Object rowData : sheetData) {
+                startRow++;
+                int startCol = 0;
+                //列数据
+                for (XlsCellConfig xlsCellConfig : xlsSheetConfig.xlsCellConfigs()) {
+                    startCol ++;
+                    Object cellValue = null;
+                    if(xlsCellConfig.targetGetMethod()!=null){
+                        cellValue = xlsCellConfig.targetGetMethod().invoke(rowData);
+                    }else if(xlsCellConfig.targetField()!=null){
+                        cellValue = xlsCellConfig.targetField().get(rowData);
+                    }
+
+                    if(xlsCellConfig.isArray()){
+                        if(((List<?>) cellValue).size()>xlsCellConfig.innerSheetIndex()){
+                            cellValue = ((List<?>) cellValue).get(xlsCellConfig.innerSheetIndex());
+                        }else{
+                            cellValue = null;
+                        }
+                    }
+
+                    if(cellValue!=null &&xlsCellConfig.innerSheetTargetGetMethod()!=null){
+                        cellValue = xlsCellConfig.innerSheetTargetGetMethod().invoke(cellValue);
+                    }else if(cellValue!=null &&xlsCellConfig.innerSheetTargetField()!=null){
+                        cellValue = xlsCellConfig.innerSheetTargetField().get(cellValue);
+                    }
+
+                    if(cellValue!=null){
+                        Row row = sheet.getRow(startRow);
+                        if(row==null){
+                            row = sheet.createRow(startRow);
+                        }
+                        Cell cell = row.getCell(startCol);
+                        if(cell==null){
+                            cell = row.createCell(startCol);
+                        }
+                        if(cellValue instanceof Boolean){
+                            cell.setCellValue((Boolean) cellValue);
+                        }else if (cellValue instanceof Double){
+                            cell.setCellValue((Double) cellValue);
+                        }else if (cellValue instanceof Integer){
+                            cell.setCellValue((Integer) cellValue);
+                        }else if (cellValue instanceof Long){
+                            cell.setCellValue((Long) cellValue);
+                        }else if (cellValue instanceof String){
+                            cell.setCellValue((String) cellValue);
+                        }else if (cellValue instanceof Date){
+                            cell.setCellValue((Date) cellValue);
+                        }else {
+                            cell.setCellValue(cellValue.toString());
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
