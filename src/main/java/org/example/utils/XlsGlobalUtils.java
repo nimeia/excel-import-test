@@ -2,13 +2,17 @@ package org.example.utils;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.service.XlsAnnotationParseService;
 import org.example.test.vo.MainVo;
 import org.example.vo.*;
 import org.example.xls.config.*;
 import org.reflections.ReflectionUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -31,6 +35,13 @@ public class XlsGlobalUtils {
 
     public static Map<String, ColumnValidation> validationMap = new HashMap<>();
 
+    public static Map<Class<? extends Annotation>,List<XlsAnnotationParseService>> parseService =new HashMap();
+
+    private static JdbcTemplate jdbcTemplate;
+
+    public static void initJdbcTemplate(JdbcTemplate jt){
+        jdbcTemplate = jt;
+    }
 
     /**
      * 加载样式与校验配置
@@ -60,6 +71,22 @@ public class XlsGlobalUtils {
                     throw new RuntimeException(e);
                 }
                 validationMap.put(o.getName(),o);
+            }
+        }
+    }
+
+
+    public static void loadAnnotationParse(String[] basePackages) {
+        List<Class<?>> annotationParse = XlsAnnotationUtils.getAllClassWithAnnotation(basePackages,XlsAnnotationParse.class);
+        for (Class<?> parser : annotationParse) {
+            if(XlsAnnotationParseService.class.isAssignableFrom(parser)){
+                XlsAnnotationParseService o = null;
+                try {
+                    o = (XlsAnnotationParseService)parser.getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                parseService.computeIfAbsent(o.getAnnotation(),(k)->new ArrayList<>()).add(o);
             }
         }
     }
@@ -294,6 +321,34 @@ public class XlsGlobalUtils {
                         }
                     }
                 }
+
+                //生成下拉选择
+                int lastRowNum = dataSheet.getLastRowNum();
+                int cellIndex = 0;
+                for (XlsCellConfig xlsCell : xlsCells) {
+                    cellIndex++;
+                    if (xlsCell.dropdown().length <= 0) continue;
+                    // 数据验证助手
+                    DataValidationHelper validationHelper = dataSheet.getDataValidationHelper();
+                    // 定义下拉列表选项
+                    String[] dropdownValues = xlsCell.dropdown();
+                    // 创建下拉列表约束
+                    DataValidationConstraint dropdownConstraint = validationHelper.createExplicitListConstraint(dropdownValues);
+                    // 定义应用数据验证的单元格范围（整列）
+                    int startRow = lastRowNum -1;
+                    int endRow = 65535; // 可以设置为所需的最大行数
+                    int startCol = cellIndex -1 ;
+                    int endCol =  cellIndex -1 ; // 0表示列A
+                    CellRangeAddressList addressList = new CellRangeAddressList(startRow, endRow, startCol, endCol);
+                    // 创建数据验证对象
+                    DataValidation dataValidation = validationHelper.createValidation(dropdownConstraint, addressList);
+                    // 启用输入框的错误提示
+                    dataValidation.setShowErrorBox(true);
+                    // 添加数据验证到工作表
+                    dataSheet.addValidationData(dataValidation);
+                }
+
+                //合并表头
                 mergeSameCells(dataSheet);
             }
 
@@ -647,6 +702,7 @@ public class XlsGlobalUtils {
             }else{
                 //普通cell
                 XlsCellConfig xlsCellConfig = new XlsCellConfig(xlsCellAnnotation);
+                initDropDownSql(xlsCellConfig);
                 xlsCellConfig.index(cellIndex);
                 xlsCellConfig.fieldRealTypeClass(fieldRealClassInSheet);
                 xlsCellConfig.field(fieldInSheet);
@@ -667,6 +723,17 @@ public class XlsGlobalUtils {
             }
         }
         return 0;
+    }
+
+    private static void initDropDownSql(XlsCellConfig xlsCellConfig) {
+        if(XlsAnnotationUtils.isNotEmptyStr(xlsCellConfig.dropdownSql())){
+            //需要实现从数据库中查询出相应的数据
+            if(jdbcTemplate == null){
+                throw new RuntimeException("jdbcTemplate 未初始化");
+            }
+            List<String> selectOptions = jdbcTemplate.queryForList(xlsCellConfig.dropdownSql(), String.class);
+            xlsCellConfig.dropdown(selectOptions.toArray(new String[]{}));
+        }
     }
 
     private static int initInnerSheetCells(int startCellIndex,
@@ -703,6 +770,7 @@ public class XlsGlobalUtils {
 
                 XlsCell xlsCellAnnotationInInnerSheet = innerSheetField.getAnnotation(XlsCell.class);
                 XlsCellConfig xlsCellConfig = new XlsCellConfig(xlsCellAnnotationInInnerSheet);
+                initDropDownSql(xlsCellConfig);
                 xlsCellConfig.index(startCellIndex);
 
                 xlsCellConfig.fieldRealTypeClass(fieldRealClassInMainSheet);

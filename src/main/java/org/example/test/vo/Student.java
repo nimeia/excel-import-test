@@ -26,7 +26,7 @@ public class Student {
     @XlsCell(index = 5)
     private String email;
 
-    @XlsCell(index = 6, validation = "dateStyle")
+    @XlsCell(index = 6)
     private Date birthDate;
 
     @XlsCell(index = 7)

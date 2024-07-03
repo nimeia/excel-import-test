@@ -10,10 +10,10 @@ public class Course {
     @XlsCell(index = 1)
     private Integer innerId;
 
-    @XlsCell(index = 2,toField = "name")
+    @XlsCell(index = 2, toField = "name")
     private String courseName;
 
-    @XlsCell(index = 3, headTitle = {"价格"},toField = "innerPrice")
+    @XlsCell(index = 3, headTitle = {"价格"}, toField = "innerPrice")
     private BigDecimal coursePrice;
 
     public Integer getInnerId() {

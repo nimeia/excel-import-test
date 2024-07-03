@@ -18,19 +18,19 @@ public class Teacher {
     @XlsCell(index = 2, headTitle = {"老师信息", "名称"})
     private String name;
 
-    @XlsCell(index = 6, headTitle = {"price"})
+    @XlsCell(index = 6, headTitle = {"price"}, validation = "Double")
     private BigDecimal price;
 
-    @XlsCell(index = 3,validation = "email")
+    @XlsCell(index = 3)
     private String email;
 
-    @XlsCell(index = 4)
+    @XlsCell(index = 4,validation = "Date")
     private Date birthDate;
 
-    @XlsCell(index = 5)
+    @XlsCell(index = 5,headTitle = "证件类型", dropdown = {"01-身份证","02-其它"})
     private String idCard;
 
-    @XlsCell(index = 7,innerSheetRowCount = 3,innerSheetToClass = CourseBusiness.class,toField = "courseBusiness")
+    @XlsCell(index = 7, innerSheetRowCount = 3, innerSheetToClass = CourseBusiness.class, toField = "courseBusiness")
     private List<Course> courses;
 
     public List<Course> getCourses() {

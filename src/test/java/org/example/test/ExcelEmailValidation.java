@@ -18,10 +18,12 @@ public class ExcelEmailValidation {
 
         // 创建自定义公式进行电子邮件验证
         String emailRegex = "^[\\w\\-]+(\\.[\\w\\-]+)*@[\\w\\-]+(\\.[\\w\\-]+)*(\\.[a-zA-Z]{2,})$";
-        String customFormula = "AND(ISNUMBER(FIND(\"@\",ADDRESS(ROW();COLUMN();2)),ISNUMBER(FIND(\".\",ADDRESS(ROW();COLUMN();2))),NOT(ISNUMBER(FIND(\" \",ADDRESS(ROW();COLUMN();2))))";
+        //String customFormula = "AND(ISNUMBER(FIND(\"@\";CELL(\"contents\"));ISNUMBER(FIND(\".\";CELL(\"contents\")));NOT(ISNUMBER(FIND(\" \";CELL(\"contents\"))))";
+        String customFormula = "AND(ISNUMBER(FIND(\"@\",CELL(\"address\"))),ISNUMBER(FIND(\".\",CELL(\"address\"))),NOT(ISNUMBER(FIND(\" \",CELL(\"address\"))))";
+
         System.out.println(customFormula);
         // 定义应用数据验证的单元格范围
-        CellRangeAddressList addressList = new CellRangeAddressList(2, 100, 0, 0);
+        CellRangeAddressList addressList = new CellRangeAddressList(1, 100, 0, 0);
 
         // 创建数据验证约束
         DataValidationConstraint constraint = validationHelper.createCustomConstraint(customFormula);

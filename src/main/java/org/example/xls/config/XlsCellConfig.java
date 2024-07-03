@@ -85,6 +85,24 @@ public class XlsCellConfig {
      */
     private int innerSheetIndex;
 
+    /**
+     * 下拉固定选项
+     *
+     */
+    private String[] dropdown;
+
+    /**
+     * 从数据库中获取数据sql
+     *
+     */
+    private String dropdownSql;
+
+    /**
+     * 选项值 key:value 的分割符
+     *
+     */
+    private String dropSplit;
+
     public XlsCellConfig(XlsCell xlsCell) {
         this.headStyle = xlsCell.headStyle();
         this.validation = xlsCell.validation();
@@ -94,6 +112,9 @@ public class XlsCellConfig {
         this.innerSheetToClass = xlsCell.innerSheetToClass();
         this.innerSheetRowCount = xlsCell.innerSheetRowCount();
         this.innerSheetToField = xlsCell.innerSheetToField();
+        this.dropdown = xlsCell.dropdown();
+        this.dropdownSql = xlsCell.dropdownSql();
+        this.dropSplit = xlsCell.dropSplit();
     }
 
     @Override
@@ -107,6 +128,34 @@ public class XlsCellConfig {
     @Override
     public int hashCode() {
         return Objects.hash(fieldRealTypeClass, field);
+    }
+
+
+    public String[] dropdown() {
+        return dropdown;
+    }
+
+    public XlsCellConfig dropdown(String[] dropdown) {
+        this.dropdown = dropdown;
+        return this;
+    }
+
+    public String dropdownSql() {
+        return dropdownSql;
+    }
+
+    public XlsCellConfig dropdownSql(String dropdownSql) {
+        this.dropdownSql = dropdownSql;
+        return this;
+    }
+
+    public String dropSplit() {
+        return dropSplit;
+    }
+
+    public XlsCellConfig dropSplit(String dropSplit) {
+        this.dropSplit = dropSplit;
+        return this;
     }
 
     public boolean isArray() {

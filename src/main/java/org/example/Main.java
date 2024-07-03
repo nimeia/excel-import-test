@@ -33,6 +33,7 @@ public class Main {
 //        }
 
         XlsGlobalUtils.loadStyleAndValidation(new String[]{"org.example"});
+        XlsGlobalUtils.loadAnnotationParse(new String[]{"org.example"});
         XlsGlobalUtils.init(new String[]{"org.example"});
 //        System.out.println(XlsGlobalUtils.allCategories);
 //        System.out.println(XlsGlobalUtils.allExcelConfigs);

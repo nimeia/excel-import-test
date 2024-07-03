@@ -29,4 +29,22 @@ public @interface XlsCell {
      */
     String toField() default "";
 
+
+    /**
+     * 下拉固定选项
+     *
+     */
+    String [] dropdown() default {};
+
+    /**
+     * 从数据库中获取数据sql
+     *
+     */
+    String dropdownSql() default "";
+
+    /**
+     * 选项值 key:value 的分割符
+     *
+     */
+    String dropSplit() default "-";
 }
