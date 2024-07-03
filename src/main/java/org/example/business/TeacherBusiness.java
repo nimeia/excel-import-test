@@ -19,6 +19,16 @@ public class TeacherBusiness {
 
     private List<CourseBusiness> courseBusiness;
 
+    private List<StudentBusiness> studentBusiness;
+
+    public List<StudentBusiness> getStudentBusiness() {
+        return studentBusiness;
+    }
+
+    public void setStudentBusiness(List<StudentBusiness> studentBusiness) {
+        this.studentBusiness = studentBusiness;
+    }
+
     public List<CourseBusiness> getBusinessInnerSheet() {
         return courseBusiness;
     }

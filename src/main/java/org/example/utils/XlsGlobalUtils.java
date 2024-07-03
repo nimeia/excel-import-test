@@ -928,47 +928,79 @@ public class XlsGlobalUtils {
      * @param parentDataList
      */
     private static void doLink(XlsSheetConfig xlsSheetConfig, Object data, List<Map<XlsSheetConfig, Object>> parentDataList) {
-        if(data ==null) return;
-        parentDataList.stream().filter( p -> {
-            try{
-                Object foreignKey = null;
-                Object parentKey = null;
-                if(xlsSheetConfig.linkGetMethod()!=null){
-                    foreignKey = xlsSheetConfig.linkGetMethod().invoke(data);
-                }else if(xlsSheetConfig.linkId()!=null){
-                    foreignKey = xlsSheetConfig.linkId().get(data);
-                }
+        if (data == null) return;
+        if(xlsSheetConfig.parentClass() == null) return;
+        Object foreignKey = null;
+        try{
+            if (xlsSheetConfig.linkGetMethod() != null) {
+                foreignKey = xlsSheetConfig.linkGetMethod().invoke(data);
+            } else if (xlsSheetConfig.linkId() != null) {
+                foreignKey = xlsSheetConfig.linkId().get(data);
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
 
-                if(xlsSheetConfig.parentLinkGetMethod()!=null){
-                    parentKey = xlsSheetConfig.parentLinkGetMethod().invoke(p);
-                }else if(xlsSheetConfig.parentLinkId()!=null){
-                    parentKey = xlsSheetConfig.parentLinkId().get(p);
+        Object finalForeignKey = foreignKey;
+        parentDataList.stream().filter(p->{
+            return p.keySet().stream().anyMatch(pk ->{
+              return pk.toClass() == xlsSheetConfig.parentClass();
+            });
+        }).map(p->{
+            List result = new ArrayList();
+            p.values().forEach(pp ->{
+                if(pp instanceof Collection<?>){
+                    result.addAll((Collection) pp);
+                }else {
+                    result.add(pp);
                 }
-                if(foreignKey==null && parentKey==null){
-                    return GenericComparator.compare(foreignKey,parentKey) == 0;
+            });
+            return result;
+        }).filter(p -> {
+            try {
+                Iterator<Object> iterator = p.iterator();
+                while (iterator.hasNext()) {
+                    Object pDatum = iterator.next();
+                    Object parentKey = null;
+                    if (xlsSheetConfig.parentLinkGetMethod() != null) {
+                        parentKey = xlsSheetConfig.parentLinkGetMethod().invoke(pDatum);
+                    } else if (xlsSheetConfig.parentLinkId() != null) {
+                        parentKey = xlsSheetConfig.parentLinkId().get(pDatum);
+                    }
+                    if (finalForeignKey != null && parentKey != null) {
+                        return GenericComparator.compare(finalForeignKey, parentKey) == 0;
+                    }
                 }
                 return false;
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-        }).forEach( p ->{
-            try{
-                if(Collection.class.isAssignableFrom(xlsSheetConfig.parentContainerField().getType())){
-                    Object list = xlsSheetConfig.parentContainerField().get(p);
-                    if(list ==null){
-                        list = XlsAnnotationUtils.newInstance(xlsSheetConfig.parentContainerField().getType());
-                        xlsSheetConfig.parentContainerField().set(p,list);
-                    }
-                    ((Collection)list).add(data);
+        }).forEach(p -> {
+            try {
+                List l = null;
+                if(p instanceof List<?>){
+                    l = p;
                 }else{
-                    if(xlsSheetConfig.parentContainerSetMethod()!=null){
-                        xlsSheetConfig.parentContainerSetMethod().invoke(p,data);
-                    }else if(xlsSheetConfig.parentContainerField()!=null){
-                        xlsSheetConfig.parentContainerField().set(p,data);
+                    l =List.of(p);
+                }
+                for(Object pData : l){
+                    if (Collection.class.isAssignableFrom(xlsSheetConfig.parentContainerField().getType())) {
+                        Object list = xlsSheetConfig.parentContainerField().get(pData);
+                        if (list == null) {
+                            list = XlsAnnotationUtils.newInstance(xlsSheetConfig.parentContainerField().getType());
+                            xlsSheetConfig.parentContainerField().set(pData, list);
+                        }
+                        ((Collection) list).add(data);
+                    } else {
+                        if (xlsSheetConfig.parentContainerSetMethod() != null) {
+                            xlsSheetConfig.parentContainerSetMethod().invoke(pData, data);
+                        } else if (xlsSheetConfig.parentContainerField() != null) {
+                            xlsSheetConfig.parentContainerField().set(pData, data);
+                        }
                     }
                 }
-            }catch (Exception e){
+
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });

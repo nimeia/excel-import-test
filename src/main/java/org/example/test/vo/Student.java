@@ -2,6 +2,7 @@ package org.example.test.vo;
 
 import org.example.business.CourseBusiness;
 import org.example.business.StudentBusiness;
+import org.example.business.TeacherBusiness;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @XlsSheet(index = 1, hidden = false, title = "学生", toClass = StudentBusiness.class
-        ,parentClass = Teacher.class,linkId = "parentId",parentLinkId = "id",parentContainerField = "students")
+        ,parentClass = TeacherBusiness.class,linkId = "parentId",parentLinkId = "id",parentContainerField = "studentBusiness")
 public class Student {
 
     @XlsCell(headTitle = {"用户", "ID"},index = 1,validation = "Integer")
