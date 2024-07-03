@@ -142,11 +142,11 @@ public class XlsAnnotationUtils {
                 targetFiledObj = field.get(targetObj);
             }
             if (targetFiledObj == null) {
-                targetFiledObj = field.getType().getDeclaredConstructor().newInstance();
+                targetFiledObj = newInstance(field.getType());//
                 newFlag = true;
-                if (setMethod == null) {
+                if (setMethod != null) {
                     setMethod.invoke(targetObj, targetFiledObj);
-                } else {
+                } else  if(field!=null){
                     field.set(targetObj, targetFiledObj);
                 }
             }
@@ -157,7 +157,7 @@ public class XlsAnnotationUtils {
                 ParameterizedType pt = (ParameterizedType) genericType;
                 // 得到泛型里的class类型对象
                 Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
-                Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                Object collectionObj = newInstance(collectionClassType);
                 ((Collection)targetFiledObj).add(collectionObj);
             }
 
@@ -189,11 +189,7 @@ public class XlsAnnotationUtils {
                 Object realObj = targetObj;
                 if (index != null && targetObj instanceof Collection<?>) {
                     while (((Collection<?>) targetObj).size() <= index) {
-                        Type genericType = field.getGenericType();
-                        ParameterizedType pt = (ParameterizedType) genericType;
-                        // 得到泛型里的class类型对象
-                        Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
-                        Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                        Object collectionObj = newInstance(innerSheetField.getDeclaringClass());
                         ((Collection) targetObj).add(collectionObj);
                     }
 
@@ -222,7 +218,7 @@ public class XlsAnnotationUtils {
                         ParameterizedType pt = (ParameterizedType) genericType;
                         // 得到泛型里的class类型对象
                         Class<?> collectionClassType = (Class<?>) pt.getActualTypeArguments()[0];
-                        Object collectionObj = collectionClassType.getDeclaredConstructor().newInstance();
+                        Object collectionObj = newInstance(collectionClassType);
                         ((Collection) targetObj).add(collectionObj);
                     }
 
@@ -335,5 +331,20 @@ public class XlsAnnotationUtils {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public static Object newInstance(Class clazz){
+        if(clazz == List.class){
+            return new ArrayList();
+        }else if(clazz == Map.class){
+            return new HashMap<>();
+        }else if(clazz == Set.class){
+            return new HashSet<>();
+        }
+        try {
+            return  clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

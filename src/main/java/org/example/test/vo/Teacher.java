@@ -33,6 +33,8 @@ public class Teacher {
     @XlsCell(index = 7, innerSheetRowCount = 3, innerSheetToClass = CourseBusiness.class, toField = "courseBusiness")
     private List<Course> courses;
 
+    private List<Student> students;
+
     public List<Course> getCourses() {
         return courses;
     }

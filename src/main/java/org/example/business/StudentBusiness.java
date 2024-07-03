@@ -13,6 +13,8 @@ public class StudentBusiness {
 
     private String email;
 
+    private Integer parentId;
+
     public Integer getId() {
         return id;
     }

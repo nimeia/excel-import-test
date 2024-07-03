@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.math.BigDecimal;
 import java.util.*;
 
 public class XlsGlobalUtils {
@@ -404,7 +403,7 @@ public class XlsGlobalUtils {
                 List<XlsSheetConfig> xlsSheetList = xlsExcel.sheetConfigs();//allSheetConfigs.get(clazz);
                 if (xlsSheetList == null) return null;
 
-                Object result = xlsExcel.bindClass().getDeclaredConstructor().newInstance();
+                Object result = XlsAnnotationUtils.newInstance(xlsExcel.bindClass());
 
                 boolean sameFlag = false;
                 if (xlsExcel.bindClass().isAnnotationPresent(XlsSheet.class)) {
@@ -413,7 +412,6 @@ public class XlsGlobalUtils {
 
                 for (XlsSheetConfig xlsSheet : xlsSheetList) {
                     Sheet dataSheet = workbook.getSheet(xlsSheet.title());
-//                    List<XlsCellConfig> xlsCells = xlsSheet.xlsCellConfigs();//allCellConfigs.get(xlsSheet.bindClass());
                     int lastRowNum = dataSheet.getLastRowNum();
                     List datalist = new ArrayList<>();
 
@@ -440,7 +438,7 @@ public class XlsGlobalUtils {
                     for (int rowIndex = xlsSheet.headRow(); rowIndex <= lastRowNum; rowIndex++) {
                         Row currentRowData = dataSheet.getRow(rowIndex);
                         int lastCellNum = currentRowData.getLastCellNum();
-                        Object mainSheetData = xlsSheet.fieldRealTypeClass().getDeclaredConstructor().newInstance();
+                        Object mainSheetData = XlsAnnotationUtils.newInstance(xlsSheet.fieldRealTypeClass());
                         for (int i = 0; i < lastCellNum; i++) {
                             //Field field = fieldList.get(i);
                             XlsCellConfig xlsCellConfig = xlsCellList.get(i);
@@ -452,23 +450,23 @@ public class XlsGlobalUtils {
                                     Object co = xlsCellConfig.field().get(mainSheetData);
                                     if (co == null) {
                                         //o is list
-                                        Object list = xlsCellConfig.field().getType().getDeclaredConstructor().newInstance();
+                                        Object list = XlsAnnotationUtils.newInstance(xlsCellConfig.field().getType());
                                         xlsCellConfig.field().set(mainSheetData, list);
                                         co = list;
                                     }
                                     // 计算当前是第几个
-                                    if (xlsCellConfig.innerSheetIndex() > ((Collection<?>) co).size()) {
-                                        data = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
+                                    if (xlsCellConfig.innerSheetIndex() >= ((Collection<?>) co).size()) {
+                                        data = XlsAnnotationUtils.newInstance(xlsCellConfig.fieldRealTypeClass());
                                         ((Collection) co).add(data);
                                     } else {
-                                        data = ((Collection<?>) co).toArray()[xlsCellConfig.innerSheetIndex()];
+                                        data = ((List<?>) co).get(xlsCellConfig.innerSheetIndex());
                                     }
                                     // ((Collection)co).add(data);
                                 } else {
                                     Object co = xlsCellConfig.field().get(mainSheetData);
                                     if (co == null) {
-                                        Object o = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
-                                        co = o;
+                                        //Object o = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
+                                        co = XlsAnnotationUtils.newInstance(xlsCellConfig.fieldRealTypeClass());//.getDeclaredConstructor().newInstance();
                                         xlsCellConfig.field().set(mainSheetData, co);
                                     }
                                     data = co;
@@ -609,7 +607,8 @@ public class XlsGlobalUtils {
                     loopObj = listObj.get(i);
                 }
                 if (loopObj == null) continue;
-                Object targetObj = targetClass.getDeclaredConstructor().newInstance();
+                //Object targetObj = targetClass.getDeclaredConstructor().newInstance();
+                Object targetObj = XlsAnnotationUtils.newInstance(targetClass);//.getDeclaredConstructor().newInstance();
                 Object finalLoopObj = loopObj;
                 sheetConfig.xlsCellConfigs().forEach(cellConfig -> {
                     if (cellConfig.innerSheetField() != null) {
@@ -785,9 +784,7 @@ public class XlsGlobalUtils {
                 xlsCellConfig.targetSetMethod(XlsAnnotationUtils.getSetterMethod(xlsSheetConfig.toClass(),toFieldName));
                 xlsCellConfig.targetGetMethod(XlsAnnotationUtils.getGetterMethod(xlsSheetConfig.toClass(),toFieldName));
 
-                if (xlsCellConfig.headTitle().length == 0) {
-                    xlsCellConfig.headTitle(new String[]{fieldInMainSheet.getName()});
-                }
+
 
                 //设置inner Sheet 部分
                 xlsCellConfig.innerSheetIndex(innerCellLoopIndex);
@@ -804,6 +801,9 @@ public class XlsGlobalUtils {
                 xlsCellConfig.innerSheetTargetGetMethod(XlsAnnotationUtils.getGetterMethod(xlsCellAnnotationInMainSheet.innerSheetToClass(),innerFieldToName));
                 xlsCellConfig.innerSheetTargetSetMethod(XlsAnnotationUtils.getSetterMethod(xlsCellAnnotationInMainSheet.innerSheetToClass(),innerFieldToName));
 
+                if (xlsCellConfig.headTitle().length == 0) {
+                    xlsCellConfig.headTitle(new String[]{xlsCellConfig.innerSheetField().getName()});
+                }
                 xlsSheetConfig.xlsCellConfigs().add(xlsCellConfig);
             }
         }
@@ -957,7 +957,7 @@ public class XlsGlobalUtils {
                 if(Collection.class.isAssignableFrom(xlsSheetConfig.parentContainerField().getType())){
                     Object list = xlsSheetConfig.parentContainerField().get(p);
                     if(list ==null){
-                        list = xlsSheetConfig.parentContainerField().getType().getDeclaredConstructor().newInstance();
+                        list = XlsAnnotationUtils.newInstance(xlsSheetConfig.parentContainerField().getType());
                         xlsSheetConfig.parentContainerField().set(p,list);
                     }
                     ((Collection)list).add(data);
@@ -1100,4 +1100,5 @@ public class XlsGlobalUtils {
             throw new RuntimeException(e);
         }
     }
+
 }

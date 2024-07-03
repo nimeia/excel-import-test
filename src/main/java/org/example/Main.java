@@ -45,22 +45,25 @@ public class Main {
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         List<XlsCellConfig> xlsCellConfigs = XlsGlobalUtils.allExcelConfigs.values().iterator().next().sheetConfigs().get(0).xlsCellConfigs();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        XlsGlobalUtils.getXlsTemplate(MainVo.class,outputStream);
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        XlsGlobalUtils.getXlsTemplate(MainVo.class,outputStream);
+//
+//        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate.xlsx")){
+//            fileOutputStream.write(outputStream.toByteArray());
+//        }
 
-        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate.xlsx")){
-            fileOutputStream.write(outputStream.toByteArray());
-        }
-//
-//        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./test-import.xlsx"));
-//        Object o = XlsGlobalUtils.loadData(byteArray);
-//        System.out.println(o);
+        byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./target/tempate-target.xlsx"));
+        Object o = XlsGlobalUtils.loadData(byteArray);
+        System.out.println(o);
+
 ////
-//        List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
+        List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
 ////
-//        System.out.println(businessObj);
+        System.out.println(businessObj);
 //
-//        XlsGlobalUtils.buildStruct(businessObj);
+        XlsGlobalUtils.buildStruct(businessObj);
+
+        System.out.println(businessObj);
 //
 //        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 //        XlsGlobalUtils.export(Map.of(),MainVo.class,byteArrayOutputStream);

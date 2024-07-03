@@ -7,8 +7,10 @@ import org.example.vo.XlsSheet;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
-@XlsSheet(index = 1, hidden = false, title = "学生", toClass = StudentBusiness.class)
+@XlsSheet(index = 1, hidden = false, title = "学生", toClass = StudentBusiness.class
+        ,parentClass = Teacher.class,linkId = "parentId",parentLinkId = "id",parentContainerField = "students")
 public class Student {
 
     @XlsCell(headTitle = {"用户", "ID"},index = 1,validation = "Integer")
@@ -31,6 +33,8 @@ public class Student {
 
     @XlsCell(index = 7)
     private String idCard;
+
+
 
     public Integer getId() {
         return id;
