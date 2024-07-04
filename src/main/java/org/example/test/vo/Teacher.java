@@ -5,6 +5,8 @@ import org.example.business.TeacherBusiness;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsSheet;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -16,12 +18,14 @@ public class Teacher {
     private Integer id;
 
     @XlsCell(index = 2, headTitle = {"老师信息", "名称"})
+    @Size(min = 2, max = 30, message = "Name must be between 2 and 30 characters")
     private String name;
 
     @XlsCell(index = 6, headTitle = {"price"}, validation = "Double")
     private BigDecimal price;
 
     @XlsCell(index = 3)
+    @Email(message = "Email should be valid")
     private String email;
 
     @XlsCell(index = 4,validation = "Date" ,format = "yyyy/MM/dd" ,columnWeight = 3000)

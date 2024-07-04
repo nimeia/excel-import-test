@@ -54,7 +54,13 @@ public class Main {
         }
 
         byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./target/tempate-target.xlsx"));
-        Object o = XlsGlobalUtils.loadData(byteArray);
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        Object o = XlsGlobalUtils.loadData(byteArray,errorStream);
+        if(errorStream.size() > 0){
+            FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate-target-error.xlsx");
+            fileOutputStream.write(errorStream.toByteArray());
+            fileOutputStream.close();
+        }
         System.out.println(o);
 
         List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
