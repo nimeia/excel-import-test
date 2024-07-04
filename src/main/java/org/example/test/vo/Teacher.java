@@ -21,14 +21,14 @@ public class Teacher {
     @Size(min = 2, max = 30, message = "Name must be between 2 and 30 characters")
     private String name;
 
-    @XlsCell(index = 6, headTitle = {"price"}, validation = "Double")
+    @XlsCell(index = 6, headTitle = {"price"}, validation = "Double",format = "#0.00")
     private BigDecimal price;
 
     @XlsCell(index = 3)
     @Email(message = "Email should be valid")
     private String email;
 
-    @XlsCell(index = 4,validation = "Date" ,format = "yyyy/MM/dd" ,columnWeight = 3000)
+    @XlsCell(index = 4,validation = "Date" ,format = "yyyy/MM/dd" ,columnWeight = 12)
     private Date birthDate;
 
     @XlsCell(index = 5,headTitle = "证件类型", dropdown = {"01-身份证","02-其它"})

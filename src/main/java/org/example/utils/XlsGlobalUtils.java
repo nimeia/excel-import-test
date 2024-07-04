@@ -276,9 +276,15 @@ public class XlsGlobalUtils {
                         if (j == 0) {
                             //设置默认数据格式
                             dataSheet.autoSizeColumn(i);
-                            CellStyle columnStyle = dataSheet.getColumnStyle(i);
-
-                            if (Number.class.isAssignableFrom(xlsCell.field().getType())) {
+                            if(xlsCell.columnWeight()>0){
+                                dataSheet.setColumnWidth(i,xlsCell.columnWeight() * 256);
+                            }
+                            CellStyle columnStyle = workbook.createCellStyle();
+                            dataSheet.setDefaultColumnStyle(i, columnStyle);
+                            if(!"".equals(xlsCell.format())){
+                                CreationHelper creationHelper = workbook.getCreationHelper();
+                                columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat(xlsCell.format()));
+                            } else if (Number.class.isAssignableFrom(xlsCell.field().getType())) {
                                 if (Integer.class.isAssignableFrom(xlsCell.field().getType())) {
                                     CreationHelper creationHelper = workbook.getCreationHelper();
                                     columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat("#0"));
@@ -302,9 +308,7 @@ public class XlsGlobalUtils {
                                 columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat("@"));
                             }
                         }
-                        if (j == 0 && xlsCell.columnWeight() > 0) {
-                            dataSheet.setColumnWidth(i, xlsCell.columnWeight());
-                        }
+
                         int index = (xlsSheet.headRow() - xlsCell.headTitle().length) - j >= 0 ? 0 : j - (xlsSheet.headRow() - xlsCell.headTitle().length);
                         String value = xlsCell.headTitle()[index];
                         cell.setCellValue(value);
