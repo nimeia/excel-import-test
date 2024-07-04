@@ -1,5 +1,7 @@
 package org.example.business;
 
+import org.example.vo.XlsCell;
+
 import java.math.BigDecimal;
 
 public class StudentBusiness {
@@ -14,6 +16,8 @@ public class StudentBusiness {
     private String email;
 
     private Integer parentId;
+    private String idCard;
+
 
     public Integer getId() {
         return id;

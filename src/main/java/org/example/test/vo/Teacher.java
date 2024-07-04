@@ -24,7 +24,7 @@ public class Teacher {
     @XlsCell(index = 3)
     private String email;
 
-    @XlsCell(index = 4,validation = "Date")
+    @XlsCell(index = 4,validation = "Date" ,format = "yyyy/MM/dd" ,columnWeight = 3000)
     private Date birthDate;
 
     @XlsCell(index = 5,headTitle = "证件类型", dropdown = {"01-身份证","02-其它"})

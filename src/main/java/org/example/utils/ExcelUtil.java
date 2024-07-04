@@ -4,7 +4,7 @@ import org.apache.poi.ss.usermodel.*;
 
 public class ExcelUtil {
 
-    public static Object getCellValue(Cell cell) {
+    public static Object getCellValue(Cell cell,Class targetClass) {
         if (cell == null) {
             return null;
         }
@@ -15,7 +15,9 @@ public class ExcelUtil {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
-                } else {
+                } else if(targetClass!=null && CharSequence.class.isAssignableFrom(targetClass)) {
+                    return Double.valueOf(cell.getNumericCellValue()).intValue();
+                }else {
                     return cell.getNumericCellValue();
                 }
             case BOOLEAN:

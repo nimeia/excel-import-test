@@ -1,9 +1,13 @@
 package org.example.xls.config;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.example.vo.XlsCell;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class XlsCellConfig {
@@ -103,6 +107,16 @@ public class XlsCellConfig {
      */
     private String dropSplit;
 
+    /**
+     * 格式化
+     */
+    private String format;
+
+
+    private CellStyle cellStyle;
+
+    private Integer columnWeight;
+
     public XlsCellConfig(XlsCell xlsCell) {
         this.headStyle = xlsCell.headStyle();
         this.validation = xlsCell.validation();
@@ -115,6 +129,8 @@ public class XlsCellConfig {
         this.dropdown = xlsCell.dropdown();
         this.dropdownSql = xlsCell.dropdownSql();
         this.dropSplit = xlsCell.dropSplit();
+        this.format = xlsCell.format();
+        this.columnWeight = xlsCell.columnWeight();
     }
 
     @Override
@@ -130,6 +146,37 @@ public class XlsCellConfig {
         return Objects.hash(fieldRealTypeClass, field);
     }
 
+    public CellStyle cellStyle(Workbook workbook){
+        if(cellStyle == null && !"".equals(format)){
+            cellStyle = workbook.createCellStyle();
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat(format));
+        }
+        return cellStyle;
+    }
+
+//    public SimpleDateFormat simpleDateFormat(){
+//
+//    }
+
+
+    public Integer columnWeight() {
+        return columnWeight;
+    }
+
+    public XlsCellConfig columnWeight(Integer columnWeight) {
+        this.columnWeight = columnWeight;
+        return this;
+    }
+
+    public String format() {
+        return format;
+    }
+
+    public XlsCellConfig format(String format) {
+        this.format = format;
+        return this;
+    }
 
     public String[] dropdown() {
         return dropdown;

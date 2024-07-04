@@ -9,6 +9,7 @@ import org.example.xls.config.XlsSheetConfig;
 
 import javax.print.DocFlavor;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,32 +46,38 @@ public class Main {
         XlsGlobalUtils.allExcelConfigs.forEach((k,v)-> System.out.println(v));
         List<XlsCellConfig> xlsCellConfigs = XlsGlobalUtils.allExcelConfigs.values().iterator().next().sheetConfigs().get(0).xlsCellConfigs();
 
-//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        XlsGlobalUtils.getXlsTemplate(MainVo.class,outputStream);
-//
-//        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate.xlsx")){
-//            fileOutputStream.write(outputStream.toByteArray());
-//        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XlsGlobalUtils.getXlsTemplate(MainVo.class,outputStream);
+
+        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate.xlsx")){
+            fileOutputStream.write(outputStream.toByteArray());
+        }
 
         byte[] byteArray = IOUtils.toByteArray(new FileInputStream("./target/tempate-target.xlsx"));
         Object o = XlsGlobalUtils.loadData(byteArray);
         System.out.println(o);
 
-////
         List<Map<XlsSheetConfig, Object>> businessObj = XlsGlobalUtils.transform(o, MainVo.class);
-////
+
         System.out.println(businessObj);
-//
+
         XlsGlobalUtils.buildStruct(businessObj);
 
         System.out.println(businessObj);
-//
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        XlsGlobalUtils.export(Map.of(),MainVo.class,byteArrayOutputStream);
-//
-//        FileOutputStream fileOutputStream = new FileOutputStream("./target/export.xlsx");
-//        fileOutputStream.write(byteArrayOutputStream.toByteArray());
-//        fileOutputStream.close();
+        
+        List exportData = new ArrayList();
+        for (Map<XlsSheetConfig, Object> xlsSheetConfigObjectMap : businessObj) {
+            for (XlsSheetConfig xlsSheetConfig : xlsSheetConfigObjectMap.keySet()) {
+                exportData.add(xlsSheetConfigObjectMap.get(xlsSheetConfig));
+            }
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        XlsGlobalUtils.export(exportData,MainVo.class,byteArrayOutputStream);
+
+        FileOutputStream fileOutputStream = new FileOutputStream("./target/export.xlsx");
+        fileOutputStream.write(byteArrayOutputStream.toByteArray());
+        fileOutputStream.close();
 
     }
 }

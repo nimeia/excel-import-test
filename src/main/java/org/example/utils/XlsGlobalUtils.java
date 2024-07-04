@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class XlsGlobalUtils {
@@ -257,8 +258,40 @@ public class XlsGlobalUtils {
                     for (int i = 0; i < xlsCells.size(); i++) {
                         Cell cell = row.createCell(i);
                         XlsCellConfig xlsCell = xlsCells.get(i);
+                        if(j ==0){
+                            //设置默认数据格式
+                            dataSheet.autoSizeColumn(i);
+                            CellStyle columnStyle = dataSheet.getColumnStyle(i);
+
+                            if(Number.class.isAssignableFrom(xlsCell.field().getType())){
+                                if(Integer.class.isAssignableFrom(xlsCell.field().getType())){
+                                    CreationHelper creationHelper = workbook.getCreationHelper();
+                                    columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat("#0"));
+                                }else{
+                                    String numberFormat = "#,##0.00";
+                                    if(!"".equals(xlsCell.format())){
+                                        numberFormat = xlsCell.format();
+                                    }
+                                    CreationHelper creationHelper = workbook.getCreationHelper();
+                                    columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat(numberFormat));
+                                }
+                            }else if(Date.class.isAssignableFrom(xlsCell.field().getType())){
+                                String dateFormat = "yyyy/MM/dd";
+                                if(!"".equals(xlsCell.format())){
+                                    dateFormat = xlsCell.format();
+                                }
+                                CreationHelper creationHelper = workbook.getCreationHelper();
+                                columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat(dateFormat));
+                            }else{
+                                CreationHelper creationHelper = workbook.getCreationHelper();
+                                columnStyle.setDataFormat(creationHelper.createDataFormat().getFormat("@"));
+                            }
+                        }
+                        if (j == 0 && xlsCell.columnWeight() > 0) {
+                            dataSheet.setColumnWidth(i, xlsCell.columnWeight());
+                        }
                         int index = (xlsSheet.headRow() - xlsCell.headTitle().length) - j >= 0 ? 0 : j - (xlsSheet.headRow() - xlsCell.headTitle().length);
-                        String value =/*xlsCell.bindField()+"-"+xlsCell.index()+"-"+*/xlsCell.headTitle()[index];
+                        String value =xlsCell.headTitle()[index];
                         cell.setCellValue(value);
 
                         if (cell.getCellComment() == null) {
@@ -274,7 +307,6 @@ public class XlsGlobalUtils {
                             anchor.setRow2(cell.getRowIndex() + 2);
 
                             // 创建批注对象
-//                          if(j == xlsSheet.headRow()-1){
                             Comment comment = drawing.createCellComment(anchor);
                             RichTextString str = null;
                             if (xlsCell.innerSheetField() != null) {
@@ -288,8 +320,6 @@ public class XlsGlobalUtils {
                             comment.setVisible(false);
                             // 设置批注到单元格
                             cell.setCellComment(comment);
-//                           }
-
                         }
                         if (!xlsCell.headStyle().equals("")) {
                             // 创建单元格样式
@@ -400,7 +430,7 @@ public class XlsGlobalUtils {
                 Class<?> clazz = Class.forName(className);
                 XlsExcelConfig xlsExcel = allExcelConfigs.get(clazz);
                 if (xlsExcel == null) return null;
-                List<XlsSheetConfig> xlsSheetList = xlsExcel.sheetConfigs();//allSheetConfigs.get(clazz);
+                List<XlsSheetConfig> xlsSheetList = xlsExcel.sheetConfigs();
                 if (xlsSheetList == null) return null;
 
                 Object result = XlsAnnotationUtils.newInstance(xlsExcel.bindClass());
@@ -440,7 +470,6 @@ public class XlsGlobalUtils {
                         int lastCellNum = currentRowData.getLastCellNum();
                         Object mainSheetData = XlsAnnotationUtils.newInstance(xlsSheet.fieldRealTypeClass());
                         for (int i = 0; i < lastCellNum; i++) {
-                            //Field field = fieldList.get(i);
                             XlsCellConfig xlsCellConfig = xlsCellList.get(i);
 
                             Object data = mainSheetData;
@@ -461,25 +490,25 @@ public class XlsGlobalUtils {
                                     } else {
                                         data = ((List<?>) co).get(xlsCellConfig.innerSheetIndex());
                                     }
-                                    // ((Collection)co).add(data);
                                 } else {
                                     Object co = xlsCellConfig.field().get(mainSheetData);
                                     if (co == null) {
-                                        //Object o = xlsCellConfig.fieldRealTypeClass().getDeclaredConstructor().newInstance();
-                                        co = XlsAnnotationUtils.newInstance(xlsCellConfig.fieldRealTypeClass());//.getDeclaredConstructor().newInstance();
+                                        co = XlsAnnotationUtils.newInstance(xlsCellConfig.fieldRealTypeClass());
                                         xlsCellConfig.field().set(mainSheetData, co);
                                     }
                                     data = co;
                                 }
                             }
                             Field field = xlsCellConfig.innerSheetField()!=null ? xlsCellConfig.innerSheetField() : xlsCellConfig.field();
-                            Class<?> aClass = xlsCellConfig.innerSheetField()!=null ? xlsCellConfig.innerSheetField().getType() :  xlsCellConfig.fieldRealTypeClass();
-                            Method setMethod = xlsCellConfig.innerSheetSetMethod()!=null ? xlsCellConfig.innerSheetSetMethod() :xlsCellConfig.setMethod();
+                            Class<?> aClass = xlsCellConfig.innerSheetField()!=null ? xlsCellConfig.innerSheetField().getType() : xlsCellConfig.fieldRealTypeClass();
+                            Method setMethod = xlsCellConfig.innerSheetSetMethod()!=null ? xlsCellConfig.innerSheetSetMethod() : xlsCellConfig.setMethod();
                             // System.out.println(String.format("get cell %s,%s for %s", rowIndex, i, field));
                             // dataMap.put(headFiledNames.get(i), currentRowData.getCell(i).getStringCellValue());
-                            Object cellValue = ExcelUtil.getCellValue(currentRowData.getCell(i));
+                            Object cellValue = ExcelUtil.getCellValue(currentRowData.getCell(i),field!=null ? field.getType() : null);
+                            if (xlsCellConfig.dropdown().length > 0 && !"".equals(xlsCellConfig.dropSplit())) {
+                                cellValue = cellValue.toString().split(xlsCellConfig.dropSplit())[0];
+                            }
                             if (cellValue != null) {
-
                                 if (cellValue.getClass() == aClass) {
                                     if (setMethod != null) {
                                         setMethod.invoke(data, cellValue);
@@ -999,13 +1028,10 @@ public class XlsGlobalUtils {
                         }
                     }
                 }
-
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-
-
     }
 
     /**
@@ -1018,8 +1044,8 @@ public class XlsGlobalUtils {
         if (xlsExcelConfig == null) {
             throw new RuntimeException("未找到对应的配置数据");
         }
-        Map<XlsSheetConfig, List> splitedData = new HashMap();
-        List loopData = new ArrayList();
+        Map<XlsSheetConfig, List<?>> splitedData = new HashMap();
+        List loopData = new ArrayList<>();
         if (data instanceof Map) {
             loopData.addAll(((Map) data).values());
         } else if (data instanceof Collection<?>) {
@@ -1041,24 +1067,22 @@ public class XlsGlobalUtils {
         }
 
         loopData.forEach(v -> {
-            Class z = v.getClass();
-            if (Collection.class.isAssignableFrom(v.getClass())) {
-                Type genericType = v.getClass().getComponentType();
-                ParameterizedType pt = (ParameterizedType) genericType;
-                z = (Class<?>) pt.getActualTypeArguments()[0];
+            Class<?> z = v.getClass();
+            if (Collection.class.isAssignableFrom(v.getClass()) && !((Collection<?>) v).isEmpty()) {
+                z = ((Collection<?>) v).iterator().next().getClass();
             }
-            Class finalZ = z;
+            Class<?> finalZ = z;
             XlsSheetConfig xlsSheetConfig = xlsExcelConfig.sheetConfigs().stream().filter(sheet -> sheet.toClass() == finalZ).findFirst().orElse(null);
             if (xlsSheetConfig != null) {
-                splitedData.put(xlsSheetConfig, (v instanceof List<?>) ? (List) v : List.of(v));
+                splitedData.put(xlsSheetConfig, (v instanceof List<?>) ? (List<?>) v : List.of(v));
             }
         });
 
-        ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
-        getXlsTemplate(mainVoClass, outputStream1);
+        ByteArrayOutputStream templateOutputStream = new ByteArrayOutputStream();
+        getXlsTemplate(mainVoClass, templateOutputStream);
         Workbook workbook = null;
         try {
-            workbook = new XSSFWorkbook(new ByteArrayInputStream(outputStream1.toByteArray()));
+            workbook = new XSSFWorkbook(new ByteArrayInputStream(templateOutputStream.toByteArray()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1069,7 +1093,7 @@ public class XlsGlobalUtils {
             int startRow = xlsSheetConfig.headRow() - 1;
             for (Object rowData : sheetData) {
                 startRow++;
-                int startCol = 0;
+                int startCol = -1;
                 //列数据
                 for (XlsCellConfig xlsCellConfig : xlsSheetConfig.xlsCellConfigs()) {
                     try{
@@ -1104,19 +1128,32 @@ public class XlsGlobalUtils {
                             if(cell==null){
                                 cell = row.createCell(startCol);
                             }
-                            if(cellValue instanceof Boolean){
+                            if(!"".equals(xlsCellConfig.format())){
+                                cell.setCellStyle(xlsCellConfig.cellStyle(finalWorkbook));
+                            }
+                            if (xlsCellConfig.dropdown().length > 0) {
+                                Object finalCellValue = cellValue;
+                                String newValue = Arrays.stream(xlsCellConfig.dropdown())
+                                        .filter(d -> finalCellValue.toString().equals(d.split(xlsCellConfig.dropSplit())[0]))
+                                        .findFirst().orElse(null);
+                                cell.setCellValue(newValue);
+                            } else if (cellValue instanceof Boolean) {
                                 cell.setCellValue((Boolean) cellValue);
-                            }else if (cellValue instanceof Double){
+                            } else if (cellValue instanceof Double) {
                                 cell.setCellValue((Double) cellValue);
-                            }else if (cellValue instanceof Integer){
+                            } else if (cellValue instanceof Integer) {
                                 cell.setCellValue((Integer) cellValue);
-                            }else if (cellValue instanceof Long){
+                            } else if (cellValue instanceof Long) {
                                 cell.setCellValue((Long) cellValue);
-                            }else if (cellValue instanceof String){
+                            } else if (cellValue instanceof String) {
                                 cell.setCellValue((String) cellValue);
-                            }else if (cellValue instanceof Date){
+                            } else if (cellValue instanceof Date) {
                                 cell.setCellValue((Date) cellValue);
-                            }else {
+                            } else if (cellValue instanceof Float) {
+                                cell.setCellValue(((Float) cellValue).doubleValue());
+                            } else if (cellValue instanceof BigDecimal) {
+                                cell.setCellValue(((BigDecimal) cellValue).doubleValue());
+                            } else {
                                 cell.setCellValue(cellValue.toString());
                             }
                         }

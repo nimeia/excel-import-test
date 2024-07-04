@@ -16,6 +16,8 @@ public class TeacherBusiness {
     private Date birthDate;
 
     private String businessIdCard;
+    private String idCard;
+
 
     private List<CourseBusiness> courseBusiness;
 

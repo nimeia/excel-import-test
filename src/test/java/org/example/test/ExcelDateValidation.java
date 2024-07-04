@@ -14,6 +14,8 @@ public class ExcelDateValidation {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sheet1");
 
+//        sheet.getColumnStyle(0)
+
         // Create a cell style with date format
         CellStyle dateCellStyle = workbook.createCellStyle();
         CreationHelper createHelper = workbook.getCreationHelper();

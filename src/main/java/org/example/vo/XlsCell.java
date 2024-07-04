@@ -47,4 +47,9 @@ public @interface XlsCell {
      *
      */
     String dropSplit() default "-";
+
+    String format() default "";
+
+    int columnWeight() default -1;
+
 }
