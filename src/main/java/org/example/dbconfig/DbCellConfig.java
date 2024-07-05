@@ -16,8 +16,6 @@ public class DbCellConfig {
 
     private String fieldName;
 
-    private String genericSignature;
-
     //------------------------
     private Boolean xlsIgnore;
     private Integer xlsIndex;
@@ -32,6 +30,11 @@ public class DbCellConfig {
     private Integer index;
 
     private String innerSheetToClass = "void.class";
+
+    /**
+     * 内部类的属性类型
+     */
+    private String innerSheetFieldType;
 
     private String innerSheetToField = "";
 
@@ -49,6 +52,13 @@ public class DbCellConfig {
 
     private Integer columnWeight = -1;
 
+    public String getInnerSheetFieldType() {
+        return innerSheetFieldType;
+    }
+
+    public void setInnerSheetFieldType(String innerSheetFieldType) {
+        this.innerSheetFieldType = innerSheetFieldType;
+    }
 
     public String getFieldTypeClassName() {
         return fieldTypeClassName;
@@ -80,14 +90,6 @@ public class DbCellConfig {
 
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
-    }
-
-    public String getGenericSignature() {
-        return genericSignature;
-    }
-
-    public void setGenericSignature(String genericSignature) {
-        this.genericSignature = genericSignature;
     }
 
     public Boolean getXlsIgnore() {

@@ -6,14 +6,21 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.*;
+import org.example.business.CourseBusiness;
+import org.example.business.TeacherBusiness;
 import org.example.dbconfig.DbCellConfig;
 import org.example.dbconfig.DbExcelConfig;
 import org.example.dbconfig.DbSheetConfig;
+import org.example.test.vo.MainVo;
+import org.example.test.vo.Teacher;
 import org.example.utils.XlsAnnotationUtils;
+import org.example.utils.XlsGlobalUtils;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsExcel;
 import org.example.vo.XlsSheet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -27,7 +34,7 @@ public class DbTestMain {
         List<DbExcelConfig> dbExcelConfigs = new ArrayList<>();
         DbExcelConfig dbExcelConfig = new DbExcelConfig();
         dbExcelConfigs.add(dbExcelConfig);
-        dbExcelConfig.setCategory(new String[]{"type|key|name", "type1|key1|name1", "type2|key2|name2"});
+        dbExcelConfig.setCategory(new String[]{"type3|key3|name3", "type4|key4|name4", "type5|key6|name7"});
         dbExcelConfig.setTitle("db导入模板");
         dbExcelConfig.setPackageName(packageName);
         dbExcelConfig.setClassName("DbMainVo");
@@ -40,7 +47,7 @@ public class DbTestMain {
         dbTeacherSheetConfig.setIndex(1);
         dbTeacherSheetConfig.setTitle("教师");
         dbTeacherSheetConfig.setClassName("DbTeacher");
-        dbTeacherSheetConfig.setToClass("DbTeacherBusiness");
+        dbTeacherSheetConfig.setToClass(TeacherBusiness.class.getName());
 
         List<DbCellConfig> dbTeacherCellConfigs = new ArrayList<DbCellConfig>();
         dbTeacherSheetConfig.setDbCellConfigs(dbTeacherCellConfigs);
@@ -77,9 +84,10 @@ public class DbTestMain {
             course.setFieldType(List.class.getName());
             course.setFieldTypeClassName("Course");
             course.setFieldName("courses");
-            course.setInnerSheetToClass("DbCourseBusiness");
+            course.setInnerSheetToClass(CourseBusiness.class.getName());
             course.setInnerSheetToField("id");
             course.setInnerSheetRowCount(3);
+            course.setInnerSheetFieldType(Integer.class.getName());
             dbTeacherCellConfigs.add(course);
         }
         {
@@ -88,9 +96,10 @@ public class DbTestMain {
             course.setFieldType(List.class.getName());
             course.setFieldTypeClassName("Course");
             course.setFieldName("courses");
-            course.setInnerSheetToClass("DbCourseBusiness");
+            course.setInnerSheetToClass(CourseBusiness.class.getName());
             course.setInnerSheetToField("name");
             course.setInnerSheetRowCount(3);
+            course.setInnerSheetFieldType(String.class.getName());
             dbTeacherCellConfigs.add(course);
         }
 
@@ -118,7 +127,7 @@ public class DbTestMain {
                         for (DbCellConfig innerCellField : allInnerCellFields) {
                             index ++;
                             // 创建一个新的字段
-                            CtField ctInnerCellField = new CtField(pool.get(innerCellField.getFieldType()), innerCellField.getInnerSheetToField(), innerSheetClass);
+                            CtField ctInnerCellField = new CtField(pool.get(innerCellField.getInnerSheetFieldType()), innerCellField.getInnerSheetToField(), innerSheetClass);
                             ctInnerCellField.setModifiers(Modifier.PUBLIC);
                             //add XlsCell annotation
                             AnnotationsAttribute fieldAttr = new AnnotationsAttribute(innserSheetClassConstPool, AnnotationsAttribute.visibleTag);
@@ -272,17 +281,21 @@ public class DbTestMain {
                                                         )
                                                 })
                                 }*/null,
-                                /*new SignatureAttribute.ClassType(ctCellField.getName(),new SignatureAttribute.TypeArgument[]{
-                                        new SignatureAttribute.TypeArgument(new SignatureAttribute.ClassType(cellField.getFieldTypeClassName()))
-                                })*/null,
-                                new SignatureAttribute.ClassType[]{
+                                new SignatureAttribute.ClassType(ctCellField.getType().getName(),
+                                        new SignatureAttribute.TypeArgument[]{
+                                                new SignatureAttribute.TypeArgument(
+                                                        new SignatureAttribute.ClassType(excelConfig.getPackageName() + "." +cellField.getFieldTypeClassName())
+                                                )
+                                        })
+                                ,
+                                /*new SignatureAttribute.ClassType[]{
                                         new SignatureAttribute.ClassType(ctCellField.getType().getName(),
                                                 new SignatureAttribute.TypeArgument[]{
                                                         new SignatureAttribute.TypeArgument(
                                                                 new SignatureAttribute.ClassType( excelConfig.getPackageName() + "." +cellField.getFieldTypeClassName())
                                                         )
                                                 })
-                                })
+                                }*/null)
                                 .encode();
                         ctCellField.setGenericSignature(sig);
                         //cellField.setGenericSignature(sig);
@@ -356,15 +369,21 @@ public class DbTestMain {
                 CtField ctField = new CtField(listClass,
                         Character.toLowerCase(dbSheetConfig.getClassName().charAt(0)) +dbSheetConfig.getClassName().substring(1),
                         mainContainerClass);
-                String sig = new SignatureAttribute.ClassSignature(null,null,
-                        new SignatureAttribute.ClassType[]{
+                String sig = new SignatureAttribute.ClassSignature(null,
+                        new SignatureAttribute.ClassType(listClass.getName(),
+                                new SignatureAttribute.TypeArgument[]{
+                                        new SignatureAttribute.TypeArgument(
+                                                new SignatureAttribute.ClassType(type.getName())
+                                        )
+                                }),
+                        /*new SignatureAttribute.ClassType[]{
                                 new SignatureAttribute.ClassType(listClass.getName(),
                                 new SignatureAttribute.TypeArgument[]{
                                         new SignatureAttribute.TypeArgument(
                                                 new SignatureAttribute.ClassType(type.getName())
                                         )
                                 })
-                        }).encode();
+                        }*/null).encode();
                 ctField.setGenericSignature(sig);
                 ctField.setModifiers(Modifier.PUBLIC);
                 mainContainerClass.addField(ctField);
@@ -372,8 +391,19 @@ public class DbTestMain {
             mainContainerClass.writeFile("./target/classes/");
         }
 
+        XlsGlobalUtils.init(new String[]{
+                dbExcelConfig.getPackageName()
+        });
+
         Class<?> aClass = Class.forName(dbExcelConfig.getPackageName() + "." + dbExcelConfig.getClassName());
         Object o = aClass.getDeclaredConstructor().newInstance();
         System.out.println(o);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XlsGlobalUtils.getXlsTemplate(aClass,outputStream);
+
+        try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate-"+aClass.getSimpleName()+".xlsx")){
+            fileOutputStream.write(outputStream.toByteArray());
+        }
     }
 }
