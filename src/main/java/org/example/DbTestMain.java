@@ -243,7 +243,7 @@ public class DbTestMain {
                 //add field
                 for (DbCellConfig cellField : dbSheetConfig.getDbCellConfigs()) {
                     // 创建一个新的字段
-                    if (Arrays.stream(sheetClass.getFields()).anyMatch(e ->e.getName().equals(cellField.getFieldName()))) {
+                    if (Arrays.stream(sheetClass.getDeclaredFields()).anyMatch(e ->e.getName().equals(cellField.getFieldName()))) {
                         continue;
                     }
                     CtField ctCellField = new CtField(pool.get(cellField.getFieldType()), cellField.getFieldName(), sheetClass);

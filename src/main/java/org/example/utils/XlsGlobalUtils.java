@@ -383,7 +383,7 @@ public class XlsGlobalUtils {
                     // 创建下拉列表约束
                     DataValidationConstraint dropdownConstraint = validationHelper.createExplicitListConstraint(dropdownValues);
                     // 定义应用数据验证的单元格范围（整列）
-                    int startRow = lastRowNum - 1;
+                    int startRow = lastRowNum +1;
                     int endRow = 65535; // 可以设置为所需的最大行数
                     int startCol = cellIndex - 1;
                     int endCol = cellIndex - 1; // 0表示列A
