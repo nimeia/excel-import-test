@@ -17,8 +17,8 @@ public class DbCellConfig {
     private String fieldName;
 
     //------------------------
-    private Boolean xlsIgnore;
-    private Integer xlsIndex;
+//    private Boolean xlsIgnore;
+//    private Integer xlsIndex;
     //-------------------------
 
     private String headStyle = "headStyle";
@@ -90,22 +90,6 @@ public class DbCellConfig {
 
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
-    }
-
-    public Boolean getXlsIgnore() {
-        return xlsIgnore;
-    }
-
-    public void setXlsIgnore(Boolean xlsIgnore) {
-        this.xlsIgnore = xlsIgnore;
-    }
-
-    public Integer getXlsIndex() {
-        return xlsIndex;
-    }
-
-    public void setXlsIndex(Integer xlsIndex) {
-        this.xlsIndex = xlsIndex;
     }
 
     public String getHeadStyle() {
