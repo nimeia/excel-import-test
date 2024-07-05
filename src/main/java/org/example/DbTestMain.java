@@ -4,6 +4,7 @@ import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.*;
 import org.example.dbconfig.DbCellConfig;
 import org.example.dbconfig.DbExcelConfig;
@@ -14,13 +15,14 @@ import org.example.vo.XlsExcel;
 import org.example.vo.XlsSheet;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class DbTestMain {
 
-    public static void main(String[] args) throws NotFoundException, CannotCompileException, IOException {
+    public static void main(String[] args) throws NotFoundException, CannotCompileException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         String packageName = "org.example.db";
         List<DbExcelConfig> dbExcelConfigs = new ArrayList<>();
         DbExcelConfig dbExcelConfig = new DbExcelConfig();
@@ -45,9 +47,8 @@ public class DbTestMain {
         {
             DbCellConfig idCell = new DbCellConfig();
             idCell.setIndex(0);
-            idCell.setFieldName(Integer.class.getName());
+            idCell.setFieldType(Integer.class.getName());
             idCell.setFieldName("id");
-            idCell.setIndex(0);
             idCell.setHeadTitle(new String[]{"ID"});
             idCell.setHeadStyle("redHead");
             dbTeacherCellConfigs.add(idCell);
@@ -55,9 +56,8 @@ public class DbTestMain {
         {
             DbCellConfig idCard = new DbCellConfig();
             idCard.setIndex(1);
-            idCard.setFieldName(String.class.getName());
+            idCard.setFieldType(String.class.getName());
             idCard.setFieldName("idCard");
-            idCard.setIndex(1);
             idCard.setDropdown(new String[]{"01-身份证", "02-其它"});
             idCard.setHeadTitle(new String[]{"证件类型"});
             dbTeacherCellConfigs.add(idCard);
@@ -65,18 +65,32 @@ public class DbTestMain {
         {
             DbCellConfig email = new DbCellConfig();
             email.setIndex(2);
-            email.setFieldName(String.class.getName());
+            email.setFieldType(String.class.getName());
             email.setFieldName("email");
-            email.setIndex(2);
             dbTeacherCellConfigs.add(email);
         }
         {
             DbCellConfig course = new DbCellConfig();
             course.setIndex(3);
-            course.setFieldName(List.class.getName());
+            course.setHeadTitle(new String[]{"主键"});
+            course.setToField("toId");
+            course.setFieldType(List.class.getName());
+            course.setFieldTypeClassName("Course");
             course.setFieldName("courses");
+            course.setInnerSheetToClass("DbCourseBusiness");
+            course.setInnerSheetToField("id");
             course.setInnerSheetRowCount(3);
-            course.setIndex(3);
+            dbTeacherCellConfigs.add(course);
+        }
+        {
+            DbCellConfig course = new DbCellConfig();
+            course.setIndex(4);
+            course.setFieldType(List.class.getName());
+            course.setFieldTypeClassName("Course");
+            course.setFieldName("courses");
+            course.setInnerSheetToClass("DbCourseBusiness");
+            course.setInnerSheetToField("name");
+            course.setInnerSheetRowCount(3);
             dbTeacherCellConfigs.add(course);
         }
 
@@ -100,14 +114,16 @@ public class DbTestMain {
                         CtClass innerSheetClass = pool.makeClass(classFullName);
                         ConstPool innserSheetClassConstPool = innerSheetClass.getClassFile().getConstPool();
                         //add field
+                        int index = -1;
                         for (DbCellConfig innerCellField : allInnerCellFields) {
+                            index ++;
                             // 创建一个新的字段
-                            CtField ctInnerCellField = new CtField(pool.get(innerCellField.getFieldType()), innerCellField.getFieldName(), innerSheetClass);
+                            CtField ctInnerCellField = new CtField(pool.get(innerCellField.getFieldType()), innerCellField.getInnerSheetToField(), innerSheetClass);
                             ctInnerCellField.setModifiers(Modifier.PUBLIC);
                             //add XlsCell annotation
                             AnnotationsAttribute fieldAttr = new AnnotationsAttribute(innserSheetClassConstPool, AnnotationsAttribute.visibleTag);
                             Annotation xlsCellAnnotation = new Annotation(XlsCell.class.getName(), innserSheetClassConstPool);
-                            xlsCellAnnotation.addMemberValue("index", new IntegerMemberValue(innerCellField.getIndex(), innserSheetClassConstPool));
+                            xlsCellAnnotation.addMemberValue("index", new IntegerMemberValue(innserSheetClassConstPool, index/*innerCellField.getIndex()*/));
                             if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getToField())) {
                                 xlsCellAnnotation.addMemberValue("toField", new StringMemberValue(innerCellField.getToField(), innserSheetClassConstPool));
                             }
@@ -126,15 +142,15 @@ public class DbTestMain {
                             if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getValidation())) {
                                 xlsCellAnnotation.addMemberValue("validation", new StringMemberValue(innerCellField.getValidation(), innserSheetClassConstPool));
                             }
-                            if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getInnerSheetToClass())) {
-                                xlsCellAnnotation.addMemberValue("innerSheetToClass", new StringMemberValue(innerCellField.getInnerSheetToClass(), innserSheetClassConstPool));
-                            }
-                            if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getInnerSheetToField())) {
-                                xlsCellAnnotation.addMemberValue("innerSheetToField", new StringMemberValue(innerCellField.getInnerSheetToField(), innserSheetClassConstPool));
-                            }
-                            if (innerCellField.getInnerSheetRowCount() > 0) {
-                                xlsCellAnnotation.addMemberValue("innerSheetRowCount", new IntegerMemberValue(innerCellField.getInnerSheetRowCount(), innserSheetClassConstPool));
-                            }
+//                            if (!"void.class".equals(innerCellField.getInnerSheetToClass()) && XlsAnnotationUtils.isNotEmptyStr(innerCellField.getInnerSheetToClass())) {
+//                                xlsCellAnnotation.addMemberValue("innerSheetToClass", new ClassMemberValue(innerCellField.getInnerSheetToClass(), innserSheetClassConstPool));
+//                            }
+//                            if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getInnerSheetToField())) {
+//                                xlsCellAnnotation.addMemberValue("innerSheetToField", new StringMemberValue(innerCellField.getInnerSheetToField(), innserSheetClassConstPool));
+//                            }
+//                            if (innerCellField.getInnerSheetRowCount() > 0) {
+//                                xlsCellAnnotation.addMemberValue("innerSheetRowCount", new IntegerMemberValue( innserSheetClassConstPool, innerCellField.getInnerSheetRowCount()));
+//                            }
                             if (XlsAnnotationUtils.isNotEmptyStr(innerCellField.getDropSplit())) {
                                 xlsCellAnnotation.addMemberValue("dropSplit", new StringMemberValue(innerCellField.getDropSplit(), innserSheetClassConstPool));
                             }
@@ -154,15 +170,17 @@ public class DbTestMain {
                                 xlsCellAnnotation.addMemberValue("format", new StringMemberValue(innerCellField.getFormat(), innserSheetClassConstPool));
                             }
                             if (innerCellField.getColumnWeight() > 0) {
-                                xlsCellAnnotation.addMemberValue("columnWeight", new IntegerMemberValue(innerCellField.getColumnWeight(), innserSheetClassConstPool));
+                                xlsCellAnnotation.addMemberValue("columnWeight", new IntegerMemberValue( innserSheetClassConstPool, innerCellField.getColumnWeight()));
                             }
 
                             fieldAttr.addAnnotation(xlsCellAnnotation);
                             // 将注解属性添加到字段
                             ctInnerCellField.getFieldInfo().addAttribute(fieldAttr);
+
+                            innerSheetClass.addField(ctInnerCellField);
                         }
 
-                        innerSheetClass.writeFile("./target/dbconfig/");
+                        innerSheetClass.writeFile("./target/classes/");
                     }
                 }
             }
@@ -174,29 +192,29 @@ public class DbTestMain {
                 if (orNull != null) continue; // 已经创建
                 CtClass sheetClass = pool.makeClass(classFullName);
                 sheetClass.setModifiers(Modifier.PUBLIC);
-                ClassFile shhetClassFile = sheetClass.getClassFile();
-                ConstPool sheetClassConstPool = shhetClassFile.getConstPool();
+                ClassFile sheetClassFile = sheetClass.getClassFile();
+                ConstPool sheetClassConstPool = sheetClassFile.getConstPool();
 
                 //add XlsSheet annotation
                 AnnotationsAttribute classAnnotationAttr = new AnnotationsAttribute(sheetClassConstPool, AnnotationsAttribute.visibleTag);
                 Annotation xlsSheetAnnotation = new Annotation(XlsSheet.class.getName(), sheetClassConstPool);
                 if(dbSheetConfig.getIndex()!=null){
-                    xlsSheetAnnotation.addMemberValue("index", new StringMemberValue(dbSheetConfig.getIndex(), sheetClassConstPool));
+                    xlsSheetAnnotation.addMemberValue("index", new IntegerMemberValue(sheetClassConstPool, dbSheetConfig.getIndex()));
                 }
                 xlsSheetAnnotation.addMemberValue("title", new StringMemberValue(dbSheetConfig.getTitle(), sheetClassConstPool));
                 if (dbSheetConfig.getSheetActive() != null) {
                     xlsSheetAnnotation.addMemberValue("sheetActive", new BooleanMemberValue(dbSheetConfig.getSheetActive(), sheetClassConstPool));
                 }
                 if (dbSheetConfig.getHeadRow() != null) {
-                    xlsSheetAnnotation.addMemberValue("headRow", new IntegerMemberValue(dbSheetConfig.getHeadRow(), sheetClassConstPool));
+                    xlsSheetAnnotation.addMemberValue("headRow", new IntegerMemberValue(sheetClassConstPool, dbSheetConfig.getHeadRow()));
                 }
                 if (dbSheetConfig.getHidden() != null) {
                     xlsSheetAnnotation.addMemberValue("hidden", new BooleanMemberValue(dbSheetConfig.getHidden(), sheetClassConstPool));
                 }
-                if (XlsAnnotationUtils.isNotEmptyStr(dbSheetConfig.getToClass())) {
+                if (!"void.class".equals(dbSheetConfig.getToClass()) && XlsAnnotationUtils.isNotEmptyStr(dbSheetConfig.getToClass())) {
                     xlsSheetAnnotation.addMemberValue("toClass", new ClassMemberValue(dbSheetConfig.getToClass(), sheetClassConstPool));
                 }
-                if (XlsAnnotationUtils.isNotEmptyStr(dbSheetConfig.getParentClass())) {
+                if (!"void.class".equals(dbSheetConfig.getParentClass()) && XlsAnnotationUtils.isNotEmptyStr(dbSheetConfig.getParentClass())) {
                     xlsSheetAnnotation.addMemberValue("parentClass", new ClassMemberValue(dbSheetConfig.getParentClass(), sheetClassConstPool));
                 }
                 if (XlsAnnotationUtils.isNotEmptyStr(dbSheetConfig.getParentContainerField())) {
@@ -211,22 +229,20 @@ public class DbTestMain {
                 classAnnotationAttr.addAnnotation(xlsSheetAnnotation);
 
                 // 将注解属性添加到字段
-                shhetClassFile.addAttribute(classAnnotationAttr);
+                sheetClassFile.addAttribute(classAnnotationAttr);
 
                 //add field
                 for (DbCellConfig cellField : dbSheetConfig.getDbCellConfigs()) {
                     // 创建一个新的字段
-                    CtField ctCellField = new CtField(pool.get(cellField.getFieldType()), cellField.getFieldName(), sheetClass);
-                    CtField hadAddField = sheetClass.getField(cellField.getFieldName());
-                    if (hadAddField != null) {
+                    if (Arrays.stream(sheetClass.getFields()).anyMatch(e ->e.getName().equals(cellField.getFieldName()))) {
                         continue;
                     }
-
+                    CtField ctCellField = new CtField(pool.get(cellField.getFieldType()), cellField.getFieldName(), sheetClass);
                     ctCellField.setModifiers(Modifier.PUBLIC);
                     //add XlsCell annotation
                     AnnotationsAttribute fieldAttr = new AnnotationsAttribute(sheetClassConstPool, AnnotationsAttribute.visibleTag);
                     Annotation xlsCellAnnotation = new Annotation(XlsCell.class.getName(), sheetClassConstPool);
-                    xlsCellAnnotation.addMemberValue("index", new IntegerMemberValue(cellField.getIndex(), sheetClassConstPool));
+                    xlsCellAnnotation.addMemberValue("index", new IntegerMemberValue(sheetClassConstPool, cellField.getIndex()));
                     if (XlsAnnotationUtils.isNotEmptyStr(cellField.getToField())) {
                         xlsCellAnnotation.addMemberValue("toField", new StringMemberValue(cellField.getToField(), sheetClassConstPool));
                     }
@@ -245,14 +261,40 @@ public class DbTestMain {
                     if (XlsAnnotationUtils.isNotEmptyStr(cellField.getValidation())) {
                         xlsCellAnnotation.addMemberValue("validation", new StringMemberValue(cellField.getValidation(), sheetClassConstPool));
                     }
-                    if (XlsAnnotationUtils.isNotEmptyStr(cellField.getInnerSheetToClass())) {
-                        xlsCellAnnotation.addMemberValue("innerSheetToClass", new StringMemberValue(cellField.getInnerSheetToClass(), sheetClassConstPool));
+                    if (!"void.class".equals(cellField.getFieldTypeClassName()) && XlsAnnotationUtils.isNotEmptyStr(cellField.getFieldTypeClassName())) {
+                        // 创建一个新的字段
+                        String sig = new SignatureAttribute.ClassSignature(
+                                /*new SignatureAttribute.TypeParameter[]{
+                                        new SignatureAttribute.TypeParameter(ctCellField.getName(),null,
+                                                new SignatureAttribute.ObjectType[]{
+                                                        new SignatureAttribute.ClassType(
+                                                                cellField.getFieldTypeClassName()
+                                                        )
+                                                })
+                                }*/null,
+                                /*new SignatureAttribute.ClassType(ctCellField.getName(),new SignatureAttribute.TypeArgument[]{
+                                        new SignatureAttribute.TypeArgument(new SignatureAttribute.ClassType(cellField.getFieldTypeClassName()))
+                                })*/null,
+                                new SignatureAttribute.ClassType[]{
+                                        new SignatureAttribute.ClassType(ctCellField.getType().getName(),
+                                                new SignatureAttribute.TypeArgument[]{
+                                                        new SignatureAttribute.TypeArgument(
+                                                                new SignatureAttribute.ClassType( excelConfig.getPackageName() + "." +cellField.getFieldTypeClassName())
+                                                        )
+                                                })
+                                })
+                                .encode();
+                        ctCellField.setGenericSignature(sig);
+                        //cellField.setGenericSignature(sig);
                     }
-                    if (XlsAnnotationUtils.isNotEmptyStr(cellField.getInnerSheetToField())) {
+                    if (!"void.class".equals(cellField.getInnerSheetToClass()) && XlsAnnotationUtils.isNotEmptyStr(cellField.getInnerSheetToClass())) {
+                        xlsCellAnnotation.addMemberValue("innerSheetToClass", new ClassMemberValue(cellField.getInnerSheetToClass(), sheetClassConstPool));
+                    }
+                    /*if (XlsAnnotationUtils.isNotEmptyStr(cellField.getInnerSheetToField())) {
                         xlsCellAnnotation.addMemberValue("innerSheetToField", new StringMemberValue(cellField.getInnerSheetToField(), sheetClassConstPool));
-                    }
+                    }*/
                     if (cellField.getInnerSheetRowCount() > 0) {
-                        xlsCellAnnotation.addMemberValue("innerSheetRowCount", new IntegerMemberValue(cellField.getInnerSheetRowCount(), sheetClassConstPool));
+                        xlsCellAnnotation.addMemberValue("innerSheetRowCount", new IntegerMemberValue( sheetClassConstPool,cellField.getInnerSheetRowCount()));
                     }
                     if (XlsAnnotationUtils.isNotEmptyStr(cellField.getDropSplit())) {
                         xlsCellAnnotation.addMemberValue("dropSplit", new StringMemberValue(cellField.getDropSplit(), sheetClassConstPool));
@@ -273,7 +315,7 @@ public class DbTestMain {
                         xlsCellAnnotation.addMemberValue("format", new StringMemberValue(cellField.getFormat(), sheetClassConstPool));
                     }
                     if (cellField.getColumnWeight() > 0) {
-                        xlsCellAnnotation.addMemberValue("columnWeight", new IntegerMemberValue(cellField.getColumnWeight(), sheetClassConstPool));
+                        xlsCellAnnotation.addMemberValue("columnWeight", new IntegerMemberValue( sheetClassConstPool, cellField.getColumnWeight()));
                     }
 
                     fieldAttr.addAnnotation(xlsCellAnnotation);
@@ -283,7 +325,7 @@ public class DbTestMain {
                     sheetClass.addField(ctCellField);
                 }
 
-                sheetClass.writeFile("./target/dbconfig/");
+                sheetClass.writeFile("./target/classes/");
             }
         }
 
@@ -293,7 +335,7 @@ public class DbTestMain {
             mainContainerClass.setModifiers(Modifier.PUBLIC);
             ConstPool mainContainerClassClassPool = mainContainerClass.getClassFile().getConstPool();
             //add XLSExcel annotation
-            AnnotationsAttribute fieldAttr = new AnnotationsAttribute(mainContainerClassClassPool, AnnotationsAttribute.visibleTag);
+            AnnotationsAttribute classAttr = new AnnotationsAttribute(mainContainerClassClassPool, AnnotationsAttribute.visibleTag);
             Annotation xlsExcel = new Annotation(XlsExcel.class.getName(), mainContainerClassClassPool);
             xlsExcel.addMemberValue("title", new StringMemberValue(loopExcelConfig.getTitle(), mainContainerClassClassPool));
             ArrayMemberValue categoryArray = new ArrayMemberValue(mainContainerClassClassPool);
@@ -303,14 +345,35 @@ public class DbTestMain {
                     .toArray(new MemberValue[]{});
             categoryArray.setValue(array);
             xlsExcel.addMemberValue("category", categoryArray);
+            classAttr.addAnnotation(xlsExcel);
+            mainContainerClass.getClassFile().addAttribute(classAttr);
 
             // add sheet field
             for (DbSheetConfig dbSheetConfig : loopExcelConfig.getDbSheetConfigs()) {
                 // 创建一个新的字段
-                CtField ctField = new CtField(pool.get(loopExcelConfig.getPackageName() + "." + dbSheetConfig.getClassName()), dbSheetConfig.getClassName(), mainContainerClass);
+                CtClass listClass = pool.get("java.util.List");
+                CtClass type = pool.get(loopExcelConfig.getPackageName() + "." + dbSheetConfig.getClassName());
+                CtField ctField = new CtField(listClass,
+                        Character.toLowerCase(dbSheetConfig.getClassName().charAt(0)) +dbSheetConfig.getClassName().substring(1),
+                        mainContainerClass);
+                String sig = new SignatureAttribute.ClassSignature(null,null,
+                        new SignatureAttribute.ClassType[]{
+                                new SignatureAttribute.ClassType(listClass.getName(),
+                                new SignatureAttribute.TypeArgument[]{
+                                        new SignatureAttribute.TypeArgument(
+                                                new SignatureAttribute.ClassType(type.getName())
+                                        )
+                                })
+                        }).encode();
+                ctField.setGenericSignature(sig);
                 ctField.setModifiers(Modifier.PUBLIC);
+                mainContainerClass.addField(ctField);
             }
-            mainContainerClass.writeFile("./target/dbconfig/");
+            mainContainerClass.writeFile("./target/classes/");
         }
+
+        Class<?> aClass = Class.forName(dbExcelConfig.getPackageName() + "." + dbExcelConfig.getClassName());
+        Object o = aClass.getDeclaredConstructor().newInstance();
+        System.out.println(o);
     }
 }
