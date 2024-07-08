@@ -1,5 +1,7 @@
 package org.example.dbconfig;
 
+import java.util.List;
+
 public class DbCellConfig {
 
     private Integer id;
@@ -51,6 +53,17 @@ public class DbCellConfig {
     private String format = "";
 
     private Integer columnWeight = -1;
+
+
+    private List<DbAnnotationConfig> annotationConfigs;
+
+    public List<DbAnnotationConfig> getAnnotationConfigs() {
+        return annotationConfigs;
+    }
+
+    public void setAnnotationConfigs(List<DbAnnotationConfig> annotationConfigs) {
+        this.annotationConfigs = annotationConfigs;
+    }
 
     public String getInnerSheetFieldType() {
         return innerSheetFieldType;

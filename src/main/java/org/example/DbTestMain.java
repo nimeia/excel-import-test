@@ -8,24 +8,20 @@ import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.*;
 import org.example.business.CourseBusiness;
 import org.example.business.TeacherBusiness;
-import org.example.dbconfig.DbCellConfig;
-import org.example.dbconfig.DbExcelConfig;
-import org.example.dbconfig.DbSheetConfig;
-import org.example.test.vo.MainVo;
-import org.example.test.vo.Teacher;
+import org.example.dbconfig.*;
 import org.example.utils.XlsAnnotationUtils;
 import org.example.utils.XlsGlobalUtils;
 import org.example.vo.XlsCell;
 import org.example.vo.XlsExcel;
 import org.example.vo.XlsSheet;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class DbTestMain {
 
@@ -102,6 +98,36 @@ public class DbTestMain {
             course.setInnerSheetFieldType(String.class.getName());
             dbTeacherCellConfigs.add(course);
         }
+        {
+            DbCellConfig emailCellConfig = new DbCellConfig();
+            emailCellConfig.setIndex(5);
+            emailCellConfig.setFieldType(String.class.getName());
+            emailCellConfig.setFieldName("newEmail");
+
+            List<DbAnnotationConfig> dbAnnotationConfigs = new ArrayList<>();
+            emailCellConfig.setAnnotationConfigs(dbAnnotationConfigs);
+
+            //----
+            DbAnnotationConfig emailValidateAnnotationConfig = new DbAnnotationConfig();
+            emailValidateAnnotationConfig.setId(1);
+            emailValidateAnnotationConfig.setClassName(Email.class.getName());
+            List<DbAnnotationMemberConfig> memberConfigList = new ArrayList<>();
+            emailValidateAnnotationConfig.setMemberConfigList(memberConfigList);
+            memberConfigList.add(new DbAnnotationMemberConfig("message","邮件格式错误"));
+            dbAnnotationConfigs.add(emailValidateAnnotationConfig);
+
+            ///------------
+            DbAnnotationConfig patternValidateAnnotationConfig = new DbAnnotationConfig();
+            patternValidateAnnotationConfig.setId(2);
+            patternValidateAnnotationConfig.setClassName(Pattern.class.getName());
+            List<DbAnnotationMemberConfig> patternMemberConfigList = new ArrayList<>();
+            patternValidateAnnotationConfig.setMemberConfigList(patternMemberConfigList);
+            patternMemberConfigList.add(new DbAnnotationMemberConfig("regexp","^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
+            patternMemberConfigList.add(new DbAnnotationMemberConfig("message","正则表达式格式错误"));
+            dbAnnotationConfigs.add(patternValidateAnnotationConfig);
+
+            dbTeacherCellConfigs.add(emailCellConfig);
+        }
 
         //-------------------------------------
         // 创建一个 ClassPool 对象
@@ -116,14 +142,15 @@ public class DbTestMain {
                         CtClass orNull = pool.getOrNull(classFullName);
                         if (orNull != null) continue; // 已经创建
                         //查出所有innerClass的属性
-                        List<DbCellConfig> allInnerCellFields = dbSheetConfig.getDbCellConfigs().stream()
+                        List<DbCellConfig> allInnerCellFields = new ArrayList<>(dbSheetConfig.getDbCellConfigs().stream()
                                 .filter(cell -> dbCellConfig.getFieldTypeClassName().equals(cell.getFieldTypeClassName()))
-                                .toList();
+                                .toList());
 
                         CtClass innerSheetClass = pool.makeClass(classFullName);
                         ConstPool innserSheetClassConstPool = innerSheetClass.getClassFile().getConstPool();
                         //add field
                         int index = -1;
+                        Collections.sort(allInnerCellFields,(e1,e2)->e1.getIndex() - e2.getIndex());
                         for (DbCellConfig innerCellField : allInnerCellFields) {
                             index ++;
                             // 创建一个新的字段
@@ -183,8 +210,12 @@ public class DbTestMain {
                             }
 
                             fieldAttr.addAnnotation(xlsCellAnnotation);
+                            //增加配置化的Annotation
+                            setOtherAnnotations(innerCellField, innserSheetClassConstPool, ctInnerCellField,fieldAttr);
                             // 将注解属性添加到字段
                             ctInnerCellField.getFieldInfo().addAttribute(fieldAttr);
+
+
 
                             innerSheetClass.addField(ctInnerCellField);
                         }
@@ -333,7 +364,9 @@ public class DbTestMain {
 
                     fieldAttr.addAnnotation(xlsCellAnnotation);
 
+                    setOtherAnnotations(cellField,sheetClassConstPool,ctCellField,fieldAttr);
                     // 将注解属性添加到字段
+
                     ctCellField.getFieldInfo().addAttribute(fieldAttr);
                     sheetClass.addField(ctCellField);
                 }
@@ -404,6 +437,66 @@ public class DbTestMain {
 
         try(FileOutputStream fileOutputStream = new FileOutputStream("./target/tempate-"+aClass.getSimpleName()+".xlsx")){
             fileOutputStream.write(outputStream.toByteArray());
+        }
+//        CtClass ctClass = pool.get(aClass.getName());
+//        Object[] annotations = ctClass.getAnnotations();
+//        ctClass.getClassFile().addAttribute();
+
+//        System.out.println(annotations);
+    }
+
+    /**
+     * 增加配置化的Annotation
+     * @param cellField
+     * @param cassConstPool
+     * @param ctCellField
+     */
+    private static void setOtherAnnotations(DbCellConfig cellField, ConstPool cassConstPool, CtField ctCellField, AnnotationsAttribute otherFieldAttr) {
+        List<DbAnnotationConfig> annotationConfigs = cellField.getAnnotationConfigs();
+        if(annotationConfigs == null) return;
+        for (DbAnnotationConfig annotationConfig : annotationConfigs) {
+            //add XlsCell annotation
+            //AnnotationsAttribute otherFieldAttr = new AnnotationsAttribute(cassConstPool, AnnotationsAttribute.visibleTag);
+            Annotation otherXlsCellAnnotation = new Annotation(annotationConfig.getClassName(), cassConstPool);
+            List<DbAnnotationMemberConfig> memberConfigList = annotationConfig.getMemberConfigList();
+            for (DbAnnotationMemberConfig dbAnnotationMemberConfig : memberConfigList) {
+                if(String.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new StringMemberValue(dbAnnotationMemberConfig.getValue(), cassConstPool));
+                }else if(Integer.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new IntegerMemberValue(cassConstPool, Integer.valueOf(dbAnnotationMemberConfig.getValue())));
+                }else if(Long.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new LongMemberValue( Long.valueOf(dbAnnotationMemberConfig.getValue()), cassConstPool));
+                }else if(Double.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new DoubleMemberValue( Double.valueOf(dbAnnotationMemberConfig.getValue()), cassConstPool));
+                }else if(Float.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new FloatMemberValue( Float.valueOf(dbAnnotationMemberConfig.getValue()), cassConstPool));
+                }else if(Short.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), new ShortMemberValue( Short.valueOf(dbAnnotationMemberConfig.getValue()), cassConstPool));
+                }else if(Boolean.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(),new BooleanMemberValue(Boolean.valueOf(dbAnnotationMemberConfig.getValue()), cassConstPool));
+                }else if(Character.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(),new CharMemberValue(dbAnnotationMemberConfig.getValue().charAt(0), cassConstPool));
+                }else if(Byte.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(),new ByteMemberValue(dbAnnotationMemberConfig.getValue().getBytes()[0], cassConstPool));
+                }else if(Class.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(),new ClassMemberValue(dbAnnotationMemberConfig.getValue(), cassConstPool));
+                }else if(Enum.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    EnumMemberValue value = new EnumMemberValue(cassConstPool);
+                    value.setValue(dbAnnotationMemberConfig.getValue());
+                    value.setType(dbAnnotationMemberConfig.getType());
+                    otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), value);
+                }else if(Arrays.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    throw new RuntimeException("not support yet!");
+//                                        ArrayMemberValue value = new ArrayMemberValue(cassConstPool);
+//                                        otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), value);
+                }else if(Annotation.class.getName().equals(dbAnnotationMemberConfig.getType())){
+                    throw new RuntimeException("not support yet!");
+//                                        AnnotationMemberValue value = new AnnotationMemberValue(cassConstPool);
+//                                        otherXlsCellAnnotation.addMemberValue(dbAnnotationMemberConfig.getKey(), value);
+                }
+            }
+            otherFieldAttr.addAnnotation(otherXlsCellAnnotation);
+            //ctCellField.getFieldInfo().addAttribute(otherFieldAttr);
         }
     }
 }

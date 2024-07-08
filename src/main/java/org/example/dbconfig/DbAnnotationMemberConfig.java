@@ -6,7 +6,21 @@ public class DbAnnotationMemberConfig {
 
     private String value;
 
-    private String type;
+    private String type = String.class.getName();
+
+    public DbAnnotationMemberConfig() {
+    }
+
+    public DbAnnotationMemberConfig(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public DbAnnotationMemberConfig(String key, String value, String type) {
+        this.key = key;
+        this.value = value;
+        this.type = type;
+    }
 
     public String getKey() {
         return key;
