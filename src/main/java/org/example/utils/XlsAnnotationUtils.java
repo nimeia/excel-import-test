@@ -5,6 +5,7 @@ import org.example.vo.XlsExcel;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
@@ -32,15 +33,18 @@ public class XlsAnnotationUtils {
      */
     public static <T extends Annotation> List<Class<?>> getAllClassWithAnnotation(String[] basePackages, Class<T> tClass) {
         List<XlsExcel> list = new ArrayList<XlsExcel>();
-        //get all class with XlsExcel annotation
-        // 创建 Reflections 对象，指定要扫描的包
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .forPackages(basePackages) // 这里指定你的包路径
-                .addScanners(new TypeAnnotationsScanner()));
+//        // 创建 Reflections 对象，指定要扫描的包
+//        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+//        //configurationBuilder.setClassLoaders(new ClassLoader[]{Thread.currentThread().getContextClassLoader()});
+//        configurationBuilder.setUrls(ClasspathHelper.forClassLoader(Thread.currentThread().getContextClassLoader()));
+//        Reflections reflections = new Reflections(configurationBuilder
+//                .forPackages(basePackages) // 这里指定你的包路径
+//                .addScanners(new TypeAnnotationsScanner()));
 
         // 查找所有带有 MyAnnotation 注解的类
+        Reflections reflections = new Reflections(basePackages);
         Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(tClass);
-
+        annotatedClasses = reflections.getTypesAnnotatedWith(tClass);
         //
         return annotatedClasses.stream().toList();
     }

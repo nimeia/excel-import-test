@@ -220,7 +220,8 @@ public class DbTestMain {
                             innerSheetClass.addField(ctInnerCellField);
                         }
 
-                        innerSheetClass.writeFile("./target/classes/");
+                        innerSheetClass.toClass(Thread.currentThread().getContextClassLoader());
+                        //innerSheetClass.writeFile("./target/classes/");
                     }
                 }
             }
@@ -371,7 +372,8 @@ public class DbTestMain {
                     sheetClass.addField(ctCellField);
                 }
 
-                sheetClass.writeFile("./target/classes/");
+                sheetClass.toClass(Thread.currentThread().getContextClassLoader());
+                //sheetClass.writeFile("./target/classes/");
             }
         }
 
@@ -397,7 +399,7 @@ public class DbTestMain {
             // add sheet field
             for (DbSheetConfig dbSheetConfig : loopExcelConfig.getDbSheetConfigs()) {
                 // 创建一个新的字段
-                CtClass listClass = pool.get("java.util.List");
+                CtClass listClass = pool.get(List.class.getName());
                 CtClass type = pool.get(loopExcelConfig.getPackageName() + "." + dbSheetConfig.getClassName());
                 CtField ctField = new CtField(listClass,
                         Character.toLowerCase(dbSheetConfig.getClassName().charAt(0)) +dbSheetConfig.getClassName().substring(1),
@@ -421,14 +423,23 @@ public class DbTestMain {
                 ctField.setModifiers(Modifier.PUBLIC);
                 mainContainerClass.addField(ctField);
             }
-            mainContainerClass.writeFile("./target/classes/");
+
+            mainContainerClass.toClass(Thread.currentThread().getContextClassLoader());
+            //mainContainerClass.writeFile("./target/classes/");
         }
 
-        XlsGlobalUtils.init(new String[]{
-                dbExcelConfig.getPackageName()
-        });
+        List<Class<?>> allExcelClass = new ArrayList<>();
+        for (DbExcelConfig excelConfig : dbExcelConfigs) {
+            allExcelClass.add(Class.forName(excelConfig.getPackageName()+"."+excelConfig.getClassName()));
+        }
+        XlsGlobalUtils.init(allExcelClass);
+
+//        XlsGlobalUtils.init(new String[]{
+//                dbExcelConfig.getPackageName()
+//        });
 
         Class<?> aClass = Class.forName(dbExcelConfig.getPackageName() + "." + dbExcelConfig.getClassName());
+//        Class aClass = pool.get(dbExcelConfig.getPackageName() + "." + dbExcelConfig.getClassName()).toClass();
         Object o = aClass.getDeclaredConstructor().newInstance();
         System.out.println(o);
 

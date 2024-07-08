@@ -106,17 +106,12 @@ public class XlsGlobalUtils {
         }
     }
 
-
     /**
-     * 初始化excel导入配置
      *
-     * @param basePackages
+     * @param allXlsExcel
      */
-    public static void init(String[] basePackages) {
+    public static void init(List<Class<?>> allXlsExcel){
         Map<String, Boolean> dubCheckMap = new HashMap<>();
-
-        // init category data
-        List<Class<?>> allXlsExcel = XlsAnnotationUtils.getAllClassWithAnnotation(basePackages, XlsExcel.class);
         for (Class<?> excelClass : allXlsExcel) {
             XlsExcel xlsExcel = excelClass.getAnnotation(XlsExcel.class);
             XlsExcelConfig xlsExcelConfig = new XlsExcelConfig(xlsExcel);
@@ -236,6 +231,17 @@ public class XlsGlobalUtils {
                 Collections.sort(xlsSheet.xlsCellConfigs(), (e1, e2) -> e1.index() - e2.index());
             }
         }
+    }
+
+    /**
+     * 初始化excel导入配置
+     *
+     * @param basePackages
+     */
+    public static void init(String[] basePackages) {
+        // init category data
+        List<Class<?>> allXlsExcel = XlsAnnotationUtils.getAllClassWithAnnotation(basePackages, XlsExcel.class);
+        init(allXlsExcel);
     }
 
     /**
